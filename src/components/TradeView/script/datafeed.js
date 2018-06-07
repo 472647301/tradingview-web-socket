@@ -23,7 +23,7 @@ class Datafeeds {
     return {
       supports_search: false,
       supports_group_request: false,
-      supported_resolutions: ['1', '5', '15', '30', '60', '1D', '1W', '1M'],
+      supported_resolutions: ['1', '5', '15', '30', '60', '1D', '2D', '3D', '1W', '1M'],
       supports_marks: true,
       supports_timescale_marks: true,
       supports_time: true,
@@ -91,7 +91,7 @@ class Datafeeds {
    */
   _logMessage(message) {
     if (this._enableLogging) {
-      console.log(new Date().toLocaleTimeString() + ' >> ' + message)
+      console.log(new Date().toLocaleTimeString() + ' >> ' , message)
     }
   }
   /**
@@ -211,6 +211,7 @@ class Datafeeds {
     }
 
     const onLoadedCallback = function (data) {
+      
       if (data) {
         const nodata = data.s === 'no_data'
 
@@ -223,7 +224,7 @@ class Datafeeds {
         }
 
         const bars = data.bars || []
-        onDataCallback(bars, { noData: nodata, nextTime: data.nb || data.nextTime })
+        onDataCallback(bars, { noData: nodata, nextTime: data.nextTime })
       } else {
         console.warn(['getBars(): error'])
 

@@ -4,10 +4,10 @@ import Io from './socket'
 import Datafeeds from './datafeed'
 
 export default {
-  symbol: null,
-  period: null,
   widget: null,
   dataFeed: null,
+  dataCache: {}, // 缓存数据
+  getBarTimer: null,
   init: function (options) {
 
     this.dataFeed = new Datafeeds(this)
@@ -33,9 +33,6 @@ export default {
       debug: true
     })
 
-    this.symbol = options.symbol
-    this.period = options.interval
-
     this.widget.onChartReady(() => {
       this.widget.chart().createStudy('MA Cross', false, false, [30, 120])
     })
@@ -44,48 +41,62 @@ export default {
 
   getBars: function (symbol, resolution, from, to, callback) {
 
-    // 更新数据
-    const onUpdateData = list => {
-      const data = list.data.kLine
-      console.log(data)
-      const nodata = data.s == 'no_data'
-      const bars = []
-      
-      const barsCount = nodata ? 0 : data.t.length
-      const volumePresent = typeof data.v !== undefined
-      const ohlPresent = typeof data.o !== undefined
+    let data
+    const symbolData = this.dataCache[symbol]
+    if (symbolData) {
+      data = symbolData[resolution]
+    }
+    if (resolution === 'D') {
+      resolution = '1D'
+    }
 
-      for (let i = 0; i < barsCount; ++i) {
-        const barValue = {
-          time: data.t[i] * 1000,
-          close: data.c[i],
+    if (this.getBarTimer) {
+      clearTimeout(this.getBarTimer)
+    }
+    const fromMs = from * 1000
+    const toMs = to * 1000
+    // 取缓存数据
+    const fetchCacheData = data => {
+      const newBars = []
+      let count = 0
+      data.forEach(function (element) {
+        const barTime = element.time
+        if (barTime >= fromMs && barTime <= toMs) {
+          newBars.push(element)
+          count++
         }
+      }, this)
 
-        if (ohlPresent) {
-          barValue.open = data.o[i]
-          barValue.high = data.h[i]
-          barValue.low = data.l[i]
-        } else {
-          barValue.open = barValue.high = barValue.low = barValue.close
-        }
-
-        if (volumePresent) {
-          barValue.volume = data.v[i]
-        }
-        bars.push(barValue)
+      if (count > 0) {
+        newBars.sort((l, r) => l.time > r.time ? 1 : -1)
+        callback && callback({ s: 'ok', bars: newBars })
+      } else {
+        callback && callback({ s: 'no_data' })
       }
-      
-      callback({bars: bars, s: data.s, noData: nodata, nextTime: data.nb || data.nextTime})
+      const params = {
+        resolution: resolution,
+        symbol: symbol,
+        type: 'updata',
+        from: from,
+        to: to
+      }
+      Io.subscribeKline(params, this.onUpdateData.bind(this))
     }
-
-    const params = {
-      period: resolution,
-      symbol: symbol,
-      type: 'kline',
-      from: from,
-      to: to
+    // 请求数据
+    const requestData = list => {
+      const params = {
+        resolution: resolution,
+        symbol: symbol,
+        type: 'kline',
+        from: from,
+        to: to
+      }
+      Io.subscribeKline(params, this.onUpdateData.bind(this))
+      this.getBarTimer = setTimeout(() => {
+        this.getBars(symbol, resolution, from, to, callback)
+      }, 300)
     }
-    Io.subscribeKline(params, onUpdateData)
+    data ? fetchCacheData(data) : requestData()
 
   },
 
@@ -99,9 +110,9 @@ export default {
     return parseInt(Date.now() / 1000)
   },
 
-  resolveTVSymbol(symbol) {
+  resolveTVSymbol: function (symbol) {
     return {
-      'name': symbol,
+      'name': 'AA',
       'exchange-traded': '',
       'exchange-listed': '',
       'timezone': 'Asia/Shanghai',
@@ -112,56 +123,27 @@ export default {
       'session': '24x7',
       'has_intraday': true,
       'has_no_volume': false,
-      'description': symbol,
+      'description': 'AA',
       'pricescale': 1,
-      'ticker': symbol,
-      'supported_resolutions': ['1', '5', '15', '30', '60', '1D', '1W', '1M']
+      'ticker': 'AA',
+      'supported_resolutions': ['1', '5', '15', '30', '60', '1D', '2D', '3D', '1W', '1M']
     }
   },
 
-  onUpdateData(data) {
-    // console.log(data)
-    const nodata = data.s == 'no_data'
-
-    if (data.s != 'ok' && !nodata) {
-      if (onErrorCallback) {
-        onErrorCallback(data.s);
-      }
-      return;
+  onUpdateData: function (data) {
+    if (!data.kline) {
+      return false
     }
-
-    const bars = [];
-    //	data is JSON having format {s: "status" (ok, no_data, error),
-    //  v: [volumes], t: [times], o: [opens], h: [highs], l: [lows], c:[closes], nb: "optional_unixtime_if_no_data"}
-    const barsCount = nodata ? 0 : data.t.length;
-    const volumePresent = typeof data.v !== 'undefined';
-    const ohlPresent = typeof data.o !== 'undefined';
-
-    for (let i = 0; i < barsCount; ++i) {
-      const barValue = {
-        time: data.t[i] * 1000,
-        close: data.c[i],
-      };
-
-      if (ohlPresent) {
-        barValue.open = data.o[i];
-        barValue.high = data.h[i];
-        barValue.low = data.l[i];
-      } else {
-        barValue.open = barValue.high = barValue.low = barValue.close;
-      }
-
-      if (volumePresent) {
-        barValue.volume = data.v[i];
-      }
-      bars.push(barValue);
+    if (!this.dataCache[data.symbol]) {
+      this.dataCache[data.symbol] = {}
     }
-
-    const meta = { version: that._protocolVersion, noData: true, nextTime: data.nb || data.nextTime };
-
-    // console.log('getBars bars->', bars);
-    // console.log('getBars meta->', meta);
-    // 只会执行一次
-    onDataCallback(bars, meta)
+    if (!this.dataCache[data.symbol][data.resolution]) {
+      this.dataCache[data.symbol][data.resolution] = []
+    }
+    if (data.kline.length) {
+      data.kline.forEach(elm => {
+        this.dataCache[data.symbol][data.resolution].push(elm)
+      })
+    }
   }
 }
