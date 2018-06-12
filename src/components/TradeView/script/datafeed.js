@@ -21,7 +21,7 @@ class Datafeeds {
    */
   defaultConfiguration() {
     return {
-      supports_search: false,
+      supports_search: true,
       supports_group_request: false,
       supported_resolutions: ['1', '5', '15', '30', '60', '1D', '2D', '3D', '1W', '1M'],
       supports_marks: true,
@@ -91,7 +91,7 @@ class Datafeeds {
    */
   _logMessage(message) {
     if (this._enableLogging) {
-      console.log(new Date().toLocaleTimeString() + ' >> ' , message)
+      console.log(new Date().toLocaleTimeString() + ' >> ', message)
     }
   }
   /**
@@ -130,27 +130,15 @@ class Datafeeds {
   _setupWithConfiguration(configurationData) {
     this._configuration = configurationData
 
-    if (!configurationData.exchanges) {
-      configurationData.exchanges = []
+    if (!this._configuration.exchanges) {
+      this._configuration.exchanges = []
     }
 
-    //	@obsolete; remove in 1.5
-    const supportedResolutions = configurationData.supported_resolutions || configurationData.supportedResolutions
-    configurationData.supported_resolutions = supportedResolutions
-
-    //	@obsolete; remove in 1.5
-    const symbolsTypes = configurationData.symbols_types || configurationData.symbolsTypes
-    configurationData.symbols_types = symbolsTypes
-
-
-    // if (!configurationData.supports_search && !configurationData.supports_group_request) {
-    //   throw new Error('Unsupported datafeed configuration. Must either support search, or support group request')
-    // }
-
-    if (!configurationData.supports_group_request) {
-      this.onInitialized()
+    if (this._configuration.supports_group_request) {
+      console.error(' >> ：Sorry unsupports group request')
+      return
     }
-
+    this.onInitialized()
     this._fireEvent('configuration_ready')
     this._logMessage('Initialized with ' + JSON.stringify(configurationData))
   }
@@ -198,6 +186,84 @@ class Datafeeds {
     }
   }
   /**
+   * 搜索商品
+   * @param {*String 用户在商品搜索框中输入的文字} userInput 
+   * @param {*String 请求的交易所（由用户选择）。空值表示没有指定} exchange 
+   * @param {*String 请求的商品类型：指数、股票、外汇等等（由用户选择）。空值表示没有指定} symbolType 
+   * @param {*Function 回调函数} onResultReadyCallback 
+   */
+  searchSymbols(userInput, exchange, symbolType, onResultReadyCallback) {
+    if (this._configuration.supports_search) {
+      console.log(' >> 搜索商品：', userInput, exchange, symbolType)
+      // step 1：向服务端发起请求
+      // your code
+      // step 2：返回结果
+      onResultReadyCallback([
+        // https://b.aitrade.ga/books/tradingview/book/JS-Api.html#searchSymbolsuserinput-exchange-symboltype-onresultreadycallback
+        {
+          "symbol": 'AAFR',
+          "full_name": 'BTCUSD',
+          "description": '',
+          "exchange": '',
+          "ticker": '',
+          "type": "stock" | "futures" | "bitcoin" | "forex" | "index"
+        }
+      ])
+    }
+  }
+  /**
+   * 获取时间刻度
+   * @param {*Object 商品信息} symbolInfo 
+   * @param {*Number unix时间戳 (UTC)} startDate 
+   * @param {*Number unix时间戳 (UTC)} endDate 
+   * @param {*Function 回调函数} onDataCallback 
+   * @param {*String 分辨率} resolution 
+   */
+  getTimescaleMarks(symbolInfo, startDate, endDate, onDataCallback, resolution) {
+    if (this._configuration.supports_timescale_marks) {
+      console.log(' >> 获取时间刻度：', symbolInfo, startDate, endDate, resolution)
+      // step 1：向服务端发起请求
+      // your code
+      // step 2：返回结果
+      onDataCallback([
+        {
+          color: 'red',
+          id: 'tsm1',
+          label: 'A',
+          time: 1492041600,
+          tooltip: 'test1'
+        }
+      ])
+    }
+  }
+  /**
+   * 获取K线标记
+   * @param {*Object 商品信息} symbolInfo 
+   * @param {*Number unix时间戳 (UTC)} startDate 
+   * @param {*Number unix时间戳 (UTC)} endDate 
+   * @param {*Function 回调函数} onDataCallback 
+   * @param {*String 分辨率} resolution 
+   */
+  getMarks(symbolInfo, startDate, endDate, onDataCallback, resolution) {
+    if (this._configuration.supports_marks) {
+      console.log(' >> 获取K线标记：', symbolInfo, startDate, endDate, resolution)
+      // step 1：向服务端发起请求
+      // your code
+      // step 2：返回结果
+      onDataCallback([
+        {
+          color: 'red',
+          id: 'tsm1',
+          text: 'AAA',
+          label: 'A',
+          time: 1492041600,
+          labelFontColor: '',
+          minSize: 28
+        }
+      ])
+    }
+  }
+  /**
    * 
    * @param {*Object 商品信息对象} symbolInfo 
    * @param {*String 分辨率} resolution 
@@ -212,7 +278,7 @@ class Datafeeds {
     }
 
     const onLoadedCallback = function (data) {
-      
+
       if (data) {
         const nodata = data.s === 'no_data'
 
@@ -246,7 +312,7 @@ class Datafeeds {
    * @param {*Function 回调函数} onResetCacheNeededCallback 
    */
   subscribeBars(symbolInfo, resolution, onRealtimeCallback, listenerGUID, onResetCacheNeededCallback) {
-    console.log("subscribeBars: " + symbolInfo + ", " + resolution + ", " + listenerGUID);
+    console.log('subscribeBars: ' + symbolInfo + ', ' + resolution + ', ' + listenerGUID);
     this._barsPulseUpdater.subscribeDataListener(symbolInfo, resolution, onRealtimeCallback, listenerGUID, onResetCacheNeededCallback)
   }
   /**
@@ -374,7 +440,7 @@ class DataPulseUpdater {
     this._subscribers[listenerGUID].listeners.push(newDataCallback)
   }
   /**
-   * 
+   * 计算周期范围
    * @param {*String 分辨率} resolution 
    * @param {*Number 周期范围} requiredPeriodsCount 
    */

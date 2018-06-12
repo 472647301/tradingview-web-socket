@@ -23,7 +23,7 @@ export default {
         type: 'black',
         tools: [{ name: 'Regression Trend' }]
       },
-      disabled_features: [],
+      // disabled_features: ['header_symbol_search'],
       enabled_features: [],
       numeric_formatting: {
         decimal_sign: '.'
@@ -100,17 +100,25 @@ export default {
 
   },
 
+  // 获取配置
   getConfig: function () {
+    // https://b.aitrade.ga/books/tradingview/book/UDF.html
     return {
-
+      supports_search: true,  //  请修改datafeed的searchSymbols函数
+      supports_group_request: false, // 设置为true将无法进行单个商品解析
+      supports_marks: true,  // 请修改datafeed的getMarks函数
+      supports_timescale_marks: true, // 请修改datafeed的getTimescaleMarks函数
+      supports_time: true
     }
   },
 
   getServerTime: function () {
+    // 暂时由客户端生成时间
     return parseInt(Date.now() / 1000)
   },
 
   resolveTVSymbol: function (symbol) {
+    // https://b.aitrade.ga/books/tradingview/book/Symbology.html
     return {
       'name': 'AA',
       'exchange-traded': '',
@@ -131,6 +139,7 @@ export default {
   },
 
   onUpdateData: function (data) {
+    // data为服务端websocket返回的数据
     if (!data.kline) {
       return false
     }
@@ -142,6 +151,7 @@ export default {
     }
     if (data.kline.length) {
       data.kline.forEach(elm => {
+
         this.dataCache[data.symbol][data.resolution].push(elm)
       })
     }
