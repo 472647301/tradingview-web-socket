@@ -142,6 +142,7 @@ class Datafeeds {
     const symbolsTypes = configurationData.symbols_types || configurationData.symbolsTypes
     configurationData.symbols_types = symbolsTypes
 
+
     // if (!configurationData.supports_search && !configurationData.supports_group_request) {
     //   throw new Error('Unsupported datafeed configuration. Must either support search, or support group request')
     // }

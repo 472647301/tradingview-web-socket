@@ -2,7 +2,7 @@ const Io = {
   ws: null,
   init: function () {
     const BrowserWebSocket = window.WebSocket || window.MozWebSocket
-    this.ws = new BrowserWebSocket('ws://localhost:3010')
+    this.ws = new BrowserWebSocket('ws://118.190.201.181:3010')
   },
   subscribeKline: function (params, callback) {
 
