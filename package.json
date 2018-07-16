@@ -1,5 +1,5 @@
 {
-  "name": "tv",
+  "name": "vue-tv-websocket",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "朱文波 <472647301@qq.com>",
@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "vue": "^2.5.2",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
