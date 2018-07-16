@@ -1,9 +1,9 @@
 class datafeeds {
 
-  constructor(self) {
-    this.core = self
-    const BrowserWebSocket = window.WebSocket || window.MozWebSocket
-    this.socket = new BrowserWebSocket(this.core.url || 'wss://api.fcoin.com/v2/ws')
+  constructor(vue) {
+    this.self = vue  // vue实例
+    this.subscribers = {}
+    this.requestsPending = 0
   }
 
   /**
@@ -14,8 +14,8 @@ class datafeeds {
     return new Promise((resolve, reject) => {
 
       let configuration = this.defaultConfiguration()
-      if (this.core.getConfig) {
-        configuration = Object.assign({}, this.defaultConfiguration(), this.core.getConfig())
+      if (this.self.getConfig) {
+        configuration = Object.assign(this.defaultConfiguration(), this.self.getConfig())
       }
       resolve(configuration)
 
@@ -34,8 +34,8 @@ class datafeeds {
     return new Promise((resolve, reject) => {
 
       let symbolInfo = this.defaultSymbol()
-      if (this.core.getSymbol) {
-        symbolInfo = Object.assign({}, this.defaultSymbol(), this.core.getSymbol())
+      if (this.self.getSymbol) {
+        symbolInfo = Object.assign(this.defaultSymbol(), this.self.getSymbol())
       }
       resolve(symbolInfo)
 
@@ -51,33 +51,72 @@ class datafeeds {
    * @param {*Function} onErrorCallback  回调函数
    */
   getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate, onDataCallback, onErrorCallback) {
-    console.log(symbolInfo, resolution, rangeStartDate, rangeEndDate)
-  }
-
-  /**
-   * @param {*Object} params 请求参数
-   */
-  subscribeKline(params) {
-
-    if (!this.socket.readyState) {
-      this.socket.onopen(event => {
-        this.socket.send(JSON.stringify(params))
+    return new Promise((resolve, reject) => {
+      this.self.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate).then(result => {
+        onDataCallback(result.bars, result.meta)
+        resolve(result)
       })
-    }
+    })
+  }
 
-    this.socket.send(JSON.stringify(params))
-
-    this.socket.onmessage = event => {
-      this.onUpdateData(JSON.parse(event.data))
+  /**
+   * 订阅K线数据。图表库将调用onRealtimeCallback方法以更新实时数据
+   * @param {*Object} symbolInfo 商品信息
+   * @param {*String} resolution 分辨率
+   * @param {*Function} onRealtimeCallback 回调函数 
+   * @param {*String} subscriberUID 监听的唯一标识符
+   * @param {*Function} onResetCacheNeededCallback (从1.7开始): onResetCacheNeededCallback将在bars数据发生变化时执行
+   */
+  subscribeBars(symbolInfo, resolution, onRealtimeCallback, subscriberUID, onResetCacheNeededCallback) {
+    console.log(subscriberUID)
+    this.subscribers[subscriberUID] = {
+      lastBarTime: null,
+      listener: onRealtimeCallback,
+      resolution: resolution,
+      symbolInfo: symbolInfo,
     }
   }
 
   /**
-   * @param {*Object} data 服务端返回数据
+   * 取消订阅K线数据
+   * @param {*String} subscriberUID 监听的唯一标识符
    */
-  onUpdateData(data) {
+  unsubscribeBars(subscriberUID) {
+    delete this.subscribers[subscriberUID]
+  }
+
+  /**
+   * 
+   */
+  onUpdateData() {
+    if (this.requestsPending > 0) return
+    this.requestsPending = 0
+    const loop = uid => {
+      this.requestsPending += 1
+      this.updateDataForSubscriber(uid).then(() => this.requestsPending -= 1).catch(() => this.requestsPending -= 1)
+    }
+    for (let uid in this.subscribers) {
+      loop(uid)
+    }
+  }
+
+  /**
+   * 
+   * @param {*String} subscriberUID 监听的唯一标识符
+   */
+  updateDataForSubscriber(subscriberUID) {
+    const subscriptionRecord = this.subscribers[subscriberUID]
+    const rangeEndTime = parseInt((Date.now() / 1000).toString())
+    const rangeStartTime = rangeEndTime - periodLengthSeconds(subscriptionRecord.resolution, 10)
+    return this.getBars(subscriptionRecord.symbolInfo, subscriptionRecord.resolution, rangeStartTime, rangeEndTime).then(result => {
+      this.onSubscriberDataReceived(subscriberUID, result)
+    })
+  }
+
+  onSubscriberDataReceived() {
     
   }
+
 
   /**
    * 默认配置
@@ -107,7 +146,7 @@ class datafeeds {
    */
   defaultSymbol() {
     return {
-      'name': 'AA',
+      'name': 'BTCUSDT',
       'exchange-traded': '',
       'exchange-listed': '',
       'timezone': 'Asia/Shanghai',
@@ -118,9 +157,9 @@ class datafeeds {
       'session': '24x7',
       'has_intraday': true,
       'has_no_volume': false,
-      'description': 'AA',
+      'description': 'BTCUSDT',
       'pricescale': 1,
-      'ticker': 'AA',
+      'ticker': 'BTCUSDT',
       'supported_resolutions': ['1', '5', '15', '30', '60', '1D', '2D', '3D', '1W', '1M']
     }
   }
@@ -128,3 +167,17 @@ class datafeeds {
 }
 
 export default datafeeds
+
+function periodLengthSeconds(resolution, requiredPeriodsCount) {
+  let daysCount = 0
+  if (resolution === 'D' || resolution === '1D') {
+    daysCount = requiredPeriodsCount
+  } else if (resolution === 'M' || resolution === '1M') {
+    daysCount = 31 * requiredPeriodsCount
+  } else if (resolution === 'W' || resolution === '1W') {
+    daysCount = 7 * requiredPeriodsCount
+  } else {
+    daysCount = requiredPeriodsCount * parseInt(resolution) / (24 * 60)
+  }
+  return daysCount * 24 * 60 * 60
+}

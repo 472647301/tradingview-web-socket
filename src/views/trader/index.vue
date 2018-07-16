@@ -1,6 +1,6 @@
 <template>
   <div class="trade">
-    <trader-view></trader-view>
+    <trader-view ref="tv"></trader-view>
   </div>
 </template>
 
@@ -9,6 +9,9 @@ import traderView from '@/components/TraderView'
 export default {
   components: {
     traderView
+  },
+  mounted() {
+    this.$refs.tv.init()
   }
 }
 </script>
