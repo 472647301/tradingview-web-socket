@@ -1,7 +1,7 @@
-###说明
-##主分支的tv文件（1.12正式版）是被我修改过的，charting_library(即chart文件是1.9版本修改过的)，不建议使用。
+> #说明
+主分支的tv文件（1.12正式版）是被我修改过的，charting_library(即chart文件是1.9版本修改过的)，不建议使用。
 
-##tv分支的文件（1.12正式版）是最近从官方clone过来的，原文件都在static目录下，未进行任何修改，charting_library也是官方最新的。
+tv分支的文件（1.12正式版）是最近从官方clone过来的，原文件都在static目录下，未进行任何修改，charting_library也是官方最新的。
 
 # tradingview-websocket-master
 主分支WebSocket数据由[node-websocket](https://github.com/472647301/node-websocket)提供
