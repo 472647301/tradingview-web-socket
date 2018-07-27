@@ -48,29 +48,41 @@ export default {
         this.interval = interval
       }
     },
-    unSubscribe(interval) {
-      const params = {
-        cmd: 'unsub',
-        args: [`candle.M${interval}.${this.symbol.toLowerCase()}`]
+    sendMessage(data) {
+      if (this.socket.checkOpen()) {
+        this.socket.send(data)
+      } else {
+        this.socket.on('open', () => {
+          this.socket.send(data)
+        })
       }
-      this.socket.send(params)
-      // if (this.socket.checkOpen()) {
-      //   this.socket.send(params)
-      // } else {
-      //   this.socket.on('open', () => {
-      //     this.socket.send(params)
-      //   })
-      // }
+    },
+    unSubscribe(interval) {
+      if (interval < 60) {
+        this.sendMessage({ cmd: 'unsub', args: [`candle.M${interval}.${this.symbol.toLowerCase()}`, 1440, parseInt(Date.now() / 1000)] })
+      } else if (interval >= 60) {
+        this.sendMessage({ cmd: 'unsub', args: [`candle.H${interval / 60}.${this.symbol.toLowerCase()}`, 1440, parseInt(Date.now() / 1000)] })
+      } else {
+        this.sendMessage({ cmd: 'unsub', args: [`candle.D1.${this.symbol.toLowerCase()}`, 207, parseInt(Date.now() / 1000)] })
+      }
+    },
+    subscribe() {
+      if (this.interval < 60) {
+        this.sendMessage({ cmd: 'sub', args: [`candle.M${this.interval}.${this.symbol.toLowerCase()}`] })
+      } else if (this.interval >= 60) {
+        this.sendMessage({ cmd: 'sub', args: [`candle.H${this.interval / 60}.${this.symbol.toLowerCase()}`] })
+      } else {
+        this.sendMessage({ cmd: 'sub', args: [`candle.D1.${this.symbol.toLowerCase()}`] })
+      }
     },
     onMessage(data) {
       // console.log(data)
       if (data.data && data.data.length) {
         const list = []
         const ticker = `${this.symbol}-${this.interval}`
-        const subTicker = `candle.M${this.interval}.${this.symbol.toLowerCase()}`
-        data.data.forEach(function(element) {
+        data.data.forEach(function (element) {
           list.push({
-            time: element.id * 1000,
+            time: this.interval !== 'D' || this.interval !== '1D' ? element.id * 1000 : element.id,
             open: element.open,
             high: element.high,
             low: element.low,
@@ -80,9 +92,10 @@ export default {
         }, this)
         this.cacheData[ticker] = list
         this.lastTime = list[list.length - 1].time
-        this.socket.send({ cmd: 'sub', args: [subTicker] })
+        this.subscribe()
       }
-      if (this.symbol && data.type === `candle.M${this.interval}.${this.symbol.toLowerCase()}`) {
+      if (data.type && data.type.indexOf(this.symbol.toLowerCase()) !== -1) {
+        // console.log(' >> sub:', data.type)
         this.datafeeds.barsUpdater.updateData()
         const ticker = `${this.symbol}-${this.interval}`
         const barsData = {
@@ -93,7 +106,7 @@ export default {
           close: data.close,
           volume: data.quote_vol
         }
-        if (barsData.time >= this.lastTime) {
+        if (barsData.time >= this.lastTime && this.cacheData[ticker] && this.cacheData[ticker].length) {
           this.cacheData[ticker][this.cacheData[ticker].length - 1] = barsData
         }
       }
@@ -103,7 +116,13 @@ export default {
       if (this.interval !== resolution) {
         this.unSubscribe(this.interval)
         this.interval = resolution
-        this.socket.send({ cmd: 'req', args: [`candle.M${this.interval}.${this.symbol.toLowerCase()}`, 1440, parseInt(Date.now() / 1000)] })
+        if (resolution < 60) {
+          this.sendMessage({ cmd: 'req', args: [`candle.M${this.interval}.${this.symbol.toLowerCase()}`, 1440, parseInt(Date.now() / 1000)] })
+        } else if (resolution >= 60) {
+          this.sendMessage({ cmd: 'req', args: [`candle.H${this.interval / 60}.${this.symbol.toLowerCase()}`, 1440, parseInt(Date.now() / 1000)] })
+        } else {
+          this.sendMessage({ cmd: 'req', args: [`candle.D1.${this.symbol.toLowerCase()}`, 800, parseInt(Date.now() / 1000)] })
+        }
       }
       const ticker = `${this.symbol}-${this.interval}`
       if (this.cacheData[ticker] && this.cacheData[ticker].length) {
@@ -117,7 +136,7 @@ export default {
         onLoadedCallback(newBars)
       } else {
         const self = this
-        this.getBarTimer = setTimeout(function() {
+        this.getBarTimer = setTimeout(function () {
           self.getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate, onLoadedCallback)
         }, 10)
       }

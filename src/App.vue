@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import TradeView from './components/tradeview'
+import TradeView from './components/tradeview/index'
 export default {
   name: 'App',
   components: {
