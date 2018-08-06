@@ -1,5 +1,7 @@
-# tradingview-websocket-vue
+# 说明：vue-cli3-tv-websockrt目录是vue-cli3.0生成的目录
+
 webSocket数据由[fcoin.com](https://fcoin.com/)提供
+注：getBars返回数据的逻辑是非典型的，也是和tv官方接口设计不符的
 > A Vue.js project
 
 ## Build Setup
