@@ -75,7 +75,7 @@ class socket {
   }
   destroy() {
     if (this.heartBeatTimer) {
-      clearInterval(this, this.heartBeatTimer)
+      clearInterval(this.heartBeatTimer)
       this.heartBeatTimer = null
     }
     this.doClose()
