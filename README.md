@@ -2,16 +2,14 @@
 
 ``` bash
 # 1
-当前项目的WebSocket数据由[fcoin.com](https://fcoin.com/)提供，如果[fcoin.com](https://fcoin.com/)更换了接口方式则无法获取图表数据！
-可以参考我的另外一个项目[node-tradingView-webSocket](https://github.com/472647301/Practice-case)。
+当前项目的WebSocket数据由https://fcoin.com提供，
+如果https://fcoin.com更换了接口方式则无法获取图表数据！
+可以参考我的另外一个项目https://github.com/472647301/Practice-case。
 
 # 2
 TradingView默认使用拉模型/脉冲(pulse)/刷新为基础进行更新，该项目是改写了datafeeds才实现的。
 但是由于时间关系，并没有实现全部的JS API。
 
-
-# build for production and view the bundle analyzer report
-npm run build --report
 ```
 
 > A Vue.js project
