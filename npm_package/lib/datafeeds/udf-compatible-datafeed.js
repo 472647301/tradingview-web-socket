@@ -253,7 +253,9 @@ var UDFCompatibleDatafeed = /** @class */ (function () {
         this._dataPulseProvider.unsubscribeBars(listenerGuid);
     };
     UDFCompatibleDatafeed.prototype._requestConfiguration = function () {
-        return this._send("config").catch(function (reason) {
+        return this._send("config")
+            .then(function (data) { return data; })
+            .catch(function (reason) {
             helpers_1.logMessage("UdfCompatibleDatafeed: Cannot get datafeed configuration - use default, error=" + helpers_1.getErrorMessage(reason));
             return null;
         });

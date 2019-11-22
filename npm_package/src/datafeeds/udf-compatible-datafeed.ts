@@ -495,16 +495,16 @@ export class UDFCompatibleDatafeed
   }
 
   protected _requestConfiguration(): Promise<UdfCompatibleConfiguration | null> {
-    return this._send<UdfCompatibleConfiguration>("config").catch(
-      (reason?: string | Error) => {
+    return this._send<UdfCompatibleConfiguration>("config")
+      .then(data => data)
+      .catch((reason?: string | Error) => {
         logMessage(
           `UdfCompatibleDatafeed: Cannot get datafeed configuration - use default, error=${getErrorMessage(
             reason
           )}`
         );
         return null;
-      }
-    );
+      });
   }
 
   private _send<T>(urlPath: string, params?: RequestParams): Promise<T> {
