@@ -50,7 +50,20 @@ class KlineChart extends Vue {
       }
       if (_msg && _msg.ticker && !this.klineData.length) {
         if (this.datafeed) {
-          
+          const is1D = true;
+          this.datafeed.updateData({
+            bars: [
+              {
+                time: is1D ? _msg.ticker.time + 86400000 : _msg.ticker.time,
+                open: _msg.ticker.open,
+                high: _msg.ticker.hight,
+                low: _msg.ticker.low,
+                close: _msg.ticker.close,
+                volume: _msg.ticker.amount
+              }
+            ],
+            meta: { noData: false }
+          });
         }
       }
     } catch (err) {
