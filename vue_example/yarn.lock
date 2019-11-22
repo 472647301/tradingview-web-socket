@@ -6358,10 +6358,10 @@ tough-cookie@~2.4.3:
     psl "^1.1.24"
     punycode "^1.4.1"
 
-trader-view@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/trader-view/-/trader-view-1.0.3.tgz#8d0dea663a753be4651c64b4f145066044a54cad"
-  integrity sha512-UMWkUi+kLMm4wr8Wa93IJIe3BfUXVhNlIHPjbJRAb52nzfqevCe6HGj41h2D0yYTCW8CfRPtLj6XPKpw0YAjOQ==
+trader-view@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/trader-view/-/trader-view-1.1.0.tgz#ca5aa6b3ffac37439547d8f89e4e2831122dd8b5"
+  integrity sha512-0m2Khho48lr+BZ7WilfBnMIikdzveDp+lqV4bpclZj9L9bD+epT+rBU8j+O6PEzQ7z6C7r4SfL0hUal2xKW0PA==
   dependencies:
     charting_library "^1.0.1"
 

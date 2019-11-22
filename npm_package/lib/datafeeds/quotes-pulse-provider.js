@@ -13,7 +13,7 @@ var QuotesPulseProvider = /** @class */ (function () {
         this._subscribers[listenerGuid] = {
             symbols: symbols,
             fastSymbols: fastSymbols,
-            listener: onRealtimeCallback,
+            listener: onRealtimeCallback
         };
         helpers_1.logMessage("QuotesPulseProvider: subscribed quotes with #" + listenerGuid);
     };
@@ -27,9 +27,13 @@ var QuotesPulseProvider = /** @class */ (function () {
             return;
         }
         var _loop_1 = function (listenerGuid) {
+            // tslint:disable-line:forin
             this_1._requestsPending++;
             var subscriptionRecord = this_1._subscribers[listenerGuid];
-            this_1._quotesProvider.getQuotes(updateType === 1 /* Fast */ ? subscriptionRecord.fastSymbols : subscriptionRecord.symbols)
+            this_1._quotesProvider
+                .getQuotes(updateType === 1 /* Fast */
+                ? subscriptionRecord.fastSymbols
+                : subscriptionRecord.symbols)
                 .then(function (data) {
                 _this._requestsPending--;
                 if (!_this._subscribers.hasOwnProperty(listenerGuid)) {

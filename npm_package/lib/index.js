@@ -21,20 +21,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var _TradingView = __importStar(require("charting_library"));
-var udf_compatible_datafeed_base_1 = require("./datafeeds/udf-compatible-datafeed-base");
+var udf_compatible_datafeed_1 = require("./datafeeds/udf-compatible-datafeed");
 var quotes_provider_1 = require("./datafeeds/quotes-provider");
 var requester_1 = require("./datafeeds/requester");
 var Datafeed = /** @class */ (function (_super) {
     __extends(Datafeed, _super);
-    function Datafeed(datafeedURL, options) {
+    function Datafeed(options, datafeedURL) {
+        if (datafeedURL === void 0) { datafeedURL = ""; }
         var _this = this;
-        var requester = new requester_1.Requester();
+        var requester = new requester_1.Requester(options);
         var quotesProvider = new quotes_provider_1.QuotesProvider(datafeedURL, requester);
-        _this = _super.call(this, datafeedURL, quotesProvider, requester, undefined, options) || this;
+        _this = _super.call(this, datafeedURL, quotesProvider, requester, undefined) || this;
         return _this;
     }
     return Datafeed;
-}(udf_compatible_datafeed_base_1.UDFCompatibleDatafeedBase));
+}(udf_compatible_datafeed_1.UDFCompatibleDatafeed));
 exports.Datafeed = Datafeed;
 var TradingView = /** @class */ (function (_super) {
     __extends(TradingView, _super);

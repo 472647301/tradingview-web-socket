@@ -3,13 +3,166 @@ export declare const Datafeed: DatafeedConstructor;
 export declare const TradingView: ChartingLibraryWidgetConstructor;
 
 export interface Options {
-  getBars: (
-    symbolInfo: LibrarySymbolInfo,
-    resolution: ResolutionString,
-    rangeStartDate: number,
-    rangeEndDate: number
-  ) => void;
+  /**
+   * history
+   */
+  history: (params: OptionHistory) => Promise<GetBarsResult>;
+  /**
+   * quotes
+   */
+  quotes?: (params: {
+    symbols: string[];
+  }) => Promise<UdfQuotesResponse | UdfErrorResponse>;
+  /**
+   * symbol_info
+   */
+  symbol_info?: (params: { group: string }) => Promise<ExchangeDataResponse>;
+  /**
+   * config
+   */
+  config?: () => Promise<UdfCompatibleConfiguration>;
+  /**
+   * time
+   */
+  time?: () => Promise<number>;
+  /**
+   * symbols
+   */
+  symbols?: (params: { symbol: string }) => Promise<LibrarySymbolInfo>;
+  /**
+   * marks
+   */
+  marks?: (params: OptionHistory) => Promise<Mark[]>;
+  /**
+   * timescale_marks
+   */
+  timescale_marks?: (params: OptionHistory) => Promise<TimescaleMark[]>;
+  /**
+   * search
+   */
+  search?: () => Promise<SearchSymbolResultItem[]>;
 }
+
+export interface OptionHistory {
+  symbol: string;
+  resolution: string;
+  from: number;
+  to: number;
+}
+export interface UdfCompatibleConfiguration extends DatafeedConfiguration {
+  // tslint:disable:tv-variable-name
+  supports_search?: boolean;
+  supports_group_request?: boolean;
+  // tslint:enable:tv-variable-name
+}
+export interface UdfResponse {
+  s: string;
+}
+
+export interface UdfOkResponse extends UdfResponse {
+  s: "ok";
+}
+
+export interface UdfErrorResponse {
+  s: "error";
+  errmsg: string;
+}
+
+export interface UdfQuotesResponse extends UdfOkResponse {
+  d: QuoteData[];
+}
+
+interface HistoryPartialDataResponse extends UdfOkResponse {
+  t: number[];
+  c: number[];
+  o?: never;
+  h?: never;
+  l?: never;
+  v?: never;
+}
+
+interface HistoryFullDataResponse extends UdfOkResponse {
+  t: number[];
+  c: number[];
+  o: number[];
+  h: number[];
+  l: number[];
+  v: number[];
+}
+
+interface HistoryNoDataResponse extends UdfResponse {
+  s: "no_data";
+  nextTime?: number;
+}
+
+type HistoryResponse =
+  | HistoryFullDataResponse
+  | HistoryPartialDataResponse
+  | HistoryNoDataResponse;
+
+// Here is some black magic with types to get compile-time checks of names and types
+type PickArrayedObjectFields<T> = Pick<
+  T,
+  {
+    // tslint:disable-next-line:no-any
+    [K in keyof T]-?: NonNullable<T[K]> extends any[] ? K : never;
+  }[keyof T]
+>;
+
+interface ExchangeDataResponseSymbolData {
+  type: string;
+  timezone: LibrarySymbolInfo["timezone"];
+  description: string;
+
+  "exchange-listed": string;
+  "exchange-traded": string;
+
+  "session-regular": string;
+
+  fractional: boolean;
+
+  pricescale: number;
+
+  ticker?: string;
+
+  minmov2?: number;
+  minmove2?: number;
+
+  minmov?: number;
+  minmovement?: number;
+
+  "force-session-rebuild"?: boolean;
+
+  "supported-resolutions"?: string[];
+  "intraday-multipliers"?: string[];
+
+  "has-intraday"?: boolean;
+  "has-daily"?: boolean;
+  "has-weekly-and-monthly"?: boolean;
+  "has-empty-bars"?: boolean;
+  "has-no-volume"?: boolean;
+
+  "volume-precision"?: number;
+}
+
+type ExchangeDataResponseArrayedSymbolData = PickArrayedObjectFields<
+  ExchangeDataResponseSymbolData
+>;
+type ExchangeDataResponseNonArrayedSymbolData = Pick<
+  ExchangeDataResponseSymbolData,
+  Exclude<
+    keyof ExchangeDataResponseSymbolData,
+    keyof ExchangeDataResponseArrayedSymbolData
+  >
+>;
+
+type ExchangeDataResponse = {
+  symbol: string[];
+} & {
+  [K in keyof ExchangeDataResponseSymbolData]:
+    | ExchangeDataResponseSymbolData[K]
+    | NonNullable<ExchangeDataResponseSymbolData[K]>[];
+};
 
 export interface Bar {
   time: number;
@@ -552,7 +705,7 @@ export type IDatafeed =
   | IBasicDataFeed
   | (IDatafeedChartApi & IExternalDatafeed & IDatafeedQuotesApi);
 export interface DatafeedConstructor {
-  new (datafeedURL: string, options: Options): IDatafeed;
+  new (options: Options, datafeedURL?: string): IDatafeed;
 }
 export interface ChartingLibraryWidgetOptions {
   container_id: string;
@@ -1146,7 +1299,11 @@ export interface IDatafeedChartApi {
   unsubscribeBars(listenerGuid: string): void;
   subscribeDepth?(symbol: string, callback: DomeCallback): string;
   unsubscribeDepth?(subscriberUID: string): void;
-  changeBarsData(data: GetBarsResult): void;
+  // changeBarsData(data: GetBarsResult): void;
+  /**
+   * 响应实时数据
+   * @param data
+   */
   updateData(data: GetBarsResult): void;
 }
 export interface GetBarsResult {

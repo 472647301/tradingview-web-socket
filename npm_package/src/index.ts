@@ -1,14 +1,13 @@
 import * as _TradingView from "charting_library";
-import { UDFCompatibleDatafeedBase } from "./datafeeds/udf-compatible-datafeed-base";
+import { UDFCompatibleDatafeed } from "./datafeeds/udf-compatible-datafeed";
 import { QuotesProvider } from "./datafeeds/quotes-provider";
 import { Requester } from "./datafeeds/requester";
-import { Options } from "./typings/datafeed-api";
 
-export class Datafeed extends UDFCompatibleDatafeedBase {
-  public constructor(datafeedURL: string, options: Options) {
-    const requester = new Requester();
+export class Datafeed extends UDFCompatibleDatafeed {
+  public constructor(options: any, datafeedURL: string = "") {
+    const requester = new Requester(options);
     const quotesProvider = new QuotesProvider(datafeedURL, requester);
-    super(datafeedURL, quotesProvider, requester, undefined, options);
+    super(datafeedURL, quotesProvider, requester, undefined);
   }
 }
 

@@ -17,7 +17,7 @@ var DataPulseProvider = /** @class */ (function () {
             lastBarTime: null,
             listener: newDataCallback,
             resolution: resolution,
-            symbolInfo: symbolInfo,
+            symbolInfo: symbolInfo
         };
         helpers_1.logMessage("DataPulseProvider: subscribed for #" + listenerGuid + " - {" + symbolInfo.name + ", " + resolution + "}");
     };
@@ -32,6 +32,7 @@ var DataPulseProvider = /** @class */ (function () {
         }
         this._requestsPending = 0;
         var _loop_1 = function (listenerGuid) {
+            // tslint:disable-line:forin
             this_1._requestsPending += 1;
             this_1._updateDataForSubscriber(listenerGuid, result)
                 .then(function () {
@@ -77,15 +78,17 @@ var DataPulseProvider = /** @class */ (function () {
         }
         var lastBar = bars[bars.length - 1];
         var subscriptionRecord = this._subscribers[listenerGuid];
-        if (subscriptionRecord.lastBarTime !== null && lastBar.time < subscriptionRecord.lastBarTime) {
+        if (subscriptionRecord.lastBarTime !== null &&
+            lastBar.time < subscriptionRecord.lastBarTime) {
             return;
         }
-        var isNewBar = subscriptionRecord.lastBarTime !== null && lastBar.time > subscriptionRecord.lastBarTime;
+        var isNewBar = subscriptionRecord.lastBarTime !== null &&
+            lastBar.time > subscriptionRecord.lastBarTime;
         // Pulse updating may miss some trades data (ie, if pulse period = 10 secods and new bar is started 5 seconds later after the last update, the
         // old bar's last 5 seconds trades will be lost). Thus, at fist we should broadcast old bar updates when it's ready.
         if (isNewBar) {
             if (bars.length < 2) {
-                throw new Error('Not enough bars in history for proper pulse update. Need at least 2.');
+                throw new Error("Not enough bars in history for proper pulse update. Need at least 2.");
             }
             var previousBar = bars[bars.length - 2];
             subscriptionRecord.listener(previousBar);
@@ -98,17 +101,17 @@ var DataPulseProvider = /** @class */ (function () {
 exports.DataPulseProvider = DataPulseProvider;
 function periodLengthSeconds(resolution, requiredPeriodsCount) {
     var daysCount = 0;
-    if (resolution === 'D' || resolution === '1D') {
+    if (resolution === "D" || resolution === "1D") {
         daysCount = requiredPeriodsCount;
     }
-    else if (resolution === 'M' || resolution === '1M') {
+    else if (resolution === "M" || resolution === "1M") {
         daysCount = 31 * requiredPeriodsCount;
     }
-    else if (resolution === 'W' || resolution === '1W') {
+    else if (resolution === "W" || resolution === "1W") {
         daysCount = 7 * requiredPeriodsCount;
     }
     else {
-        daysCount = requiredPeriodsCount * parseInt(resolution) / (24 * 60);
+        daysCount = (requiredPeriodsCount * parseInt(resolution)) / (24 * 60);
     }
     return daysCount * 24 * 60 * 60;
 }

@@ -1,18 +1,18 @@
 export interface RequestParams {
-	[paramName: string]: string | string[] | number;
+  [paramName: string]: string | string[] | number;
 }
 
 export interface UdfResponse {
-	s: string;
+  s: string;
 }
 
 export interface UdfOkResponse extends UdfResponse {
-	s: 'ok';
+  s: "ok";
 }
 
 export interface UdfErrorResponse {
-	s: 'error';
-	errmsg: string;
+  s: "error";
+  errmsg: string;
 }
 
 /**
@@ -20,19 +20,21 @@ export interface UdfErrorResponse {
  */
 const isLoggingEnabled = false;
 export function logMessage(message: string): void {
-	if (isLoggingEnabled) {
-		const now = new Date();
-		// tslint:disable-next-line:no-console
-		console.log(`${now.toLocaleTimeString()}.${now.getMilliseconds()}> ${message}`);
-	}
+  if (isLoggingEnabled) {
+    const now = new Date();
+    // tslint:disable-next-line:no-console
+    console.log(
+      `${now.toLocaleTimeString()}.${now.getMilliseconds()}> ${message}`
+    );
+  }
 }
 
 export function getErrorMessage(error: string | Error | undefined): string {
-	if (error === undefined) {
-		return '';
-	} else if (typeof error === 'string') {
-		return error;
-	}
+  if (error === undefined) {
+    return "";
+  } else if (typeof error === "string") {
+    return error;
+  }
 
-	return error.message;
+  return error.message;
 }

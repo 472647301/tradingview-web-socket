@@ -72,9 +72,22 @@ class KlineChart extends Vue {
   }
 
   public initDatafeed() {
-    this.datafeed = new Datafeed("https://demo_feed.tradingview.com", {
-      getBars: this.getBars.bind(this)
-    });
+    this.datafeed = new Datafeed(
+      {
+        history: params => {
+          return this.getBars(
+            params.symbol,
+            params.resolution,
+            params.from,
+            params.to
+          ).then(data => {
+            this.klineData = [];
+            return data;
+          });
+        }
+      },
+      "https://demo_feed.tradingview.com"
+    );
   }
 
   public initTradingView() {
@@ -106,13 +119,13 @@ class KlineChart extends Vue {
   }
 
   public getBars(
-    symbolInfo: LibrarySymbolInfo,
+    symbol: string,
     resolution: string,
     rangeStartDate: number,
     rangeEndDate: number
   ) {
-    console.log(symbolInfo, resolution, rangeStartDate, rangeEndDate);
-    // axios
+    console.log(symbol, resolution, rangeStartDate, rangeEndDate);
+    // return axios
     //   .post<IApi<IData[]>>("/v1/exchange/ticker/getScaleByDate", {
     //     from: rangeStartDate,
     //     symbol: "btcusdt",
@@ -133,26 +146,24 @@ class KlineChart extends Vue {
     //           volume: data[i].volume
     //         });
     //       }
-    //       if (this.datafeed) {
-    //         this.datafeed.changeBarsData({
-    //           bars: list,
-    //           meta: { noData: !list.length }
-    //         });
-    //       }
+    //       return {
+    //         bars: list,
+    //         meta: { noData: !list.length }
+    //       };
+    //     } else {
+    //       return {
+    //         bars: [],
+    //         meta: { noData: true }
+    //       };
     //     }
     //   });
     return new Promise(resolve => {
       resolve();
     }).then(() => {
-      if (this.datafeed) {
-        this.datafeed.changeBarsData({
-          bars: this.klineData,
-          meta: { noData: !this.klineData.length }
-        });
-        if (this.klineData.length) {
-          this.klineData = [];
-        }
-      }
+      return {
+        bars: this.klineData,
+        meta: { noData: !this.klineData.length }
+      };
     });
   }
 

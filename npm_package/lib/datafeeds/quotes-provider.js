@@ -9,9 +9,12 @@ var QuotesProvider = /** @class */ (function () {
     QuotesProvider.prototype.getQuotes = function (symbols) {
         var _this = this;
         return new Promise(function (resolve, reject) {
-            _this._requester.sendRequest(_this._datafeedUrl, 'quotes', { symbols: symbols })
+            _this._requester
+                .sendRequest(_this._datafeedUrl, "quotes", {
+                symbols: symbols
+            })
                 .then(function (response) {
-                if (response.s === 'ok') {
+                if (response.s === "ok") {
                     resolve(response.d);
                 }
                 else {
