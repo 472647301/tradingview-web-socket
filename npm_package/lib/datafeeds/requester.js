@@ -13,20 +13,24 @@ var Requester = /** @class */ (function () {
         if (this.options[urlPath]) {
             return this.options[urlPath](params).then(function (res) { return res; });
         }
+        if (!datafeedUrl) {
+            console.error("The " + urlPath + " configuration function, or the datafeedUrl parameter, is missing.");
+            return new Promise(function (resolve) { return resolve(); });
+        }
         if (params !== undefined) {
             var paramKeys = Object.keys(params);
             if (paramKeys.length !== 0) {
-                urlPath += "?";
+                urlPath += '?';
             }
             urlPath += paramKeys
                 .map(function (key) {
                 return encodeURIComponent(key) + "=" + encodeURIComponent(params[key].toString());
             })
-                .join("&");
+                .join('&');
         }
-        helpers_1.logMessage("New request: " + urlPath);
+        helpers_1.logMessage('New request: ' + urlPath);
         // Send user cookies if the URL is on the same origin as the calling script.
-        var options = { credentials: "same-origin" };
+        var options = { credentials: 'same-origin' };
         if (this._headers !== undefined) {
             options.headers = this._headers;
         }

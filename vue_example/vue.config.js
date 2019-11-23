@@ -6,5 +6,6 @@ module.exports = {
         target: "https://wapi.bituan.cc"
       }
     }
-  }
+  },
+  publicPath: "/vue/"
 };

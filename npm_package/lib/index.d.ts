@@ -1645,11 +1645,11 @@ export interface LibrarySymbolInfo {
    */
   exchange: string;
   listed_exchange: string;
-  timezone: Timezone;
+  timezone: string;
   /**
    * Prices format: "price" or "volume"
    */
-  format: SeriesFormat;
+  format?: string;
   /**
    * Code (Tick)
    * @example 8/16/.../256 (1/8/100 1/16/100 ... 1/256/100) or 1/10/.../10000000 (1 0.1 ... 0.0000001)
