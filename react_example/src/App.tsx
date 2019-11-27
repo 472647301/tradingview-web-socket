@@ -1,8 +1,7 @@
 import React from 'react';
 import { TradingView, Datafeed } from 'trader-view'
-import { PERIOD_SERVER, PERIOD_CLINENT, PERIODS } from './utils/const'
 import { IChartingLibraryWidget, IDatafeed, Bar } from 'trader-view'
-import moment from 'moment'
+import { PERIOD } from './utils/const'
 import axios from 'axios'
 
 type IProps = {}
@@ -10,17 +9,20 @@ class App extends React.Component<IProps> {
   public widget?: IChartingLibraryWidget
   public datafeed?: IDatafeed
   public socket?: WebSocket
-  public period = 'D'
+
+  public state = {
+    interval: '15'
+  }
 
   /**
    * 初始化WebSocket
    */
   public initWebSocket() {
-    const url = 'wss://realtime1.tdex.com/realtime'
-    this.socket = new WebSocket(url)
-    this.socket.onmessage = e => {
-      this.onSocketMessage(e.data)
-    }
+    // const url = 'wss://realtime1.tdex.com/realtime'
+    // this.socket = new WebSocket(url)
+    // this.socket.onmessage = e => {
+    //   this.onSocketMessage(e.data)
+    // }
   }
 
   /**
@@ -30,7 +32,7 @@ class App extends React.Component<IProps> {
   public onSocketMessage(msg: string) {
     try {
       const _msg = JSON.parse(msg)
-      console.log(_msg, PERIOD_SERVER)
+      console.log(_msg)
     } catch (err) {
       console.error(err)
     }
@@ -52,28 +54,25 @@ class App extends React.Component<IProps> {
       config: () => new Promise(resolve => resolve({
         supports_search: true,
         supports_group_request: false,
-        supported_resolutions: PERIODS,
-        supports_marks: true,
-        supports_timescale_marks: true,
-        supports_time: true
+        supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M'],
+        supports_marks: false,
+        supports_timescale_marks: false,
+        supports_time: false
       })),
       symbols: () => new Promise(resolve => resolve({
-        name: 'BTCUSD',
-        full_name: 'BTCUSD',
-        description: 'BTCUSD',
-        type: 'BTCUSD',
+        name: 'BTC/USDT',
+        full_name: 'BTC/USDT',
+        description: 'BTC/USDT',
+        type: 'btcusdt',
         session: '24x7',
-        exchange: 'BTCUSD',
-        listed_exchange: 'BTCUSD',
+        exchange: 'BTC',
+        listed_exchange: 'BTC',
         timezone: 'Asia/Shanghai',
         format: 'price',
         pricescale: 100,
         minmov: 1,
-        fractional: false,
         has_intraday: true,
-        has_no_volume: false,
-        supported_resolutions: PERIODS,
-        intraday_multipliers: ['1', '5', '60']
+        supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
       }))
     })
   }
@@ -81,52 +80,36 @@ class App extends React.Component<IProps> {
   /**
    * 获取历史数据
    */
-  public fetchHistoryData(symbol: string, period: string, from: number, to: number) {
-    const params = {
-      "Symbol": symbol,
-      "Key": PERIOD_CLINENT[period],
-      "Count": 500,
-      "Type": "LAST",
-      "From": from,
-      "To": to
+  public async fetchHistoryData(symbol: string, period: string, from: number, to: number) {
+    const { interval } = this.state
+    if (interval !== period) {
+      // 退订
+      // 订阅
+      this.setState({ interval: period })
     }
-    return axios.post<IApi<DataT>>('/api/v0.1.1/futures/kline', JSON.stringify({
-      Data: params,
-      "Time": null
-    }), {
-      headers: {
-        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8'
-      }
-    }).then(res => {
-      const list: Bar[] = []
-      if (res.data && res.data.Data && res.data.Data.List) {
-        const _list = res.data.Data.List
-        for (let i = 0; i < _list.length; i++) {
-          list.push(this.klineItemParse(_list[i]))
-        }
-      }
-      return {
-        bars: list,
-        meta: { noData: !list.length }
-      }
+    const res = await axios.post<IApi<DataT>>('/v1/exchange/ticker/getScaleByDate', {
+      from: from,
+      symbol: "btcusdt",
+      to: to,
+      type: PERIOD[period]
     })
-  }
-
-  /**
-   * 解析K线数据
-   */
-  public klineItemParse(item: string): Bar {
-    // 日期,时间,开盘价,最高价,最低价,收盘价,成交量
-    const kline = item.split(',')
-    const stringTime = kline[0] + ' ' + kline[1]
-    const time = Number(moment(stringTime, 'YYYY-MM-DD HH:mm:ss').format('X')) * 1000
+    const list: Bar[] = []
+    if (res.data && res.data.data) {
+      const _list = res.data.data
+      for (let i = 0; i < _list.length; i++) {
+        list.push({
+          time: _list[i].id * 1000,
+          close: _list[i].close,
+          high: _list[i].high,
+          low: _list[i].low,
+          open: _list[i].open,
+          volume: _list[i].volume
+        })
+      }
+    }
     return {
-      time: time,
-      open: Number(kline[2]),
-      close: Number(kline[5]),
-      low: Number(kline[4]),
-      high: Number(kline[3]),
-      volume: Number(kline[6])
+      bars: list,
+      meta: { noData: !list.length }
     }
   }
 
@@ -137,11 +120,12 @@ class App extends React.Component<IProps> {
     if (!this.datafeed) {
       return
     }
+    const { interval } = this.state
     this.widget = new TradingView({
       // debug: true, // uncomment this line to see Library errors and warnings in the console
       fullscreen: true,
       symbol: 'BTC/USDT',
-      interval: this.period,
+      interval: interval,
       container_id: 'tv_chart_container',
 
       //	BEWARE: no trailing slash is expected in feed URL
@@ -178,10 +162,24 @@ class App extends React.Component<IProps> {
 export default App;
 
 type IApi<T> = {
-  Status: number
-  Data: T
+  data: T
+  error: string
+  message: string
+  status: number
+  success: boolean
+  timestamp: string
+  type: string
 }
 
-type DataT = {
-  List: Array<string>
-}
+type DataT = Array<{
+  amount: number
+  close: number
+  date: string
+  high: number
+  id: number
+  low: number
+  open: number
+  symbol: string
+  type: string
+  volume: number
+}>

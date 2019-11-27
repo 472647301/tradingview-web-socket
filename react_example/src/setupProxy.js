@@ -4,8 +4,8 @@ const proxy = require('http-proxy-middleware')
 
 module.exports = function (app) {
   app.use(
-    proxy('/api', {
-      target: 'https://www.tdex.com',
+    proxy('/v1', {
+      target: 'https://wapi.bituan.cc',
       changeOrigin: true,
       // pathRewrite: {
       //   '^/api': ''
