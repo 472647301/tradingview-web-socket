@@ -48,6 +48,10 @@ export interface OptionHistory {
   resolution: string;
   from: number;
   to: number;
+  /**
+   * 标识是否第一次调用此商品/周期的历史记录
+   */
+  firstDataRequest: boolean
 }
 export interface UdfCompatibleConfiguration extends DatafeedConfiguration {
   // tslint:disable:tv-variable-name
@@ -159,10 +163,10 @@ type ExchangeDataResponseNonArrayedSymbolData = Pick<
 type ExchangeDataResponse = {
   symbol: string[];
 } & {
-  [K in keyof ExchangeDataResponseSymbolData]:
+    [K in keyof ExchangeDataResponseSymbolData]:
     | ExchangeDataResponseSymbolData[K]
     | NonNullable<ExchangeDataResponseSymbolData[K]>[];
-};
+  };
 
 export interface Bar {
   time: number;
@@ -697,7 +701,7 @@ export interface ChartMetaInfo {
   timestamp: number;
 }
 export interface ChartingLibraryWidgetConstructor {
-  new (
+  new(
     options: ChartingLibraryWidgetOptions | TradingTerminalWidgetOptions
   ): IChartingLibraryWidget;
 }
@@ -705,7 +709,7 @@ export type IDatafeed =
   | IBasicDataFeed
   | (IDatafeedChartApi & IExternalDatafeed & IDatafeedQuotesApi);
 export interface DatafeedConstructor {
-  new (options: Options, datafeedURL?: string): IDatafeed;
+  new(options: Options, datafeedURL?: string): IDatafeed;
 }
 export interface ChartingLibraryWidgetOptions {
   container_id: string;
@@ -762,11 +766,11 @@ export interface CreateButtonOptions {
 }
 export interface CreateShapeOptions<TOverrides extends object> {
   shape?:
-    | "arrow_up"
-    | "arrow_down"
-    | "flag"
-    | "vertical_line"
-    | "horizontal_line";
+  | "arrow_up"
+  | "arrow_down"
+  | "flag"
+  | "vertical_line"
+  | "horizontal_line";
   text?: string;
   lock?: boolean;
   disableSelection?: boolean;
@@ -865,7 +869,7 @@ export interface DatafeedSymbolType {
   name: string;
   value: string;
 }
-export interface DefaultContextMenuActionsParams {}
+export interface DefaultContextMenuActionsParams { }
 export interface DefaultDropdownActionsParams {
   showFloatingToolbar?: boolean;
   showDOM?: boolean;

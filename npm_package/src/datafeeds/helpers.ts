@@ -1,5 +1,5 @@
 export interface RequestParams {
-  [paramName: string]: string | string[] | number;
+  [paramName: string]: string | string[] | number | boolean;
 }
 
 export interface UdfResponse {

@@ -60,13 +60,15 @@ export class HistoryProvider {
     symbolInfo: LibrarySymbolInfo,
     resolution: string,
     rangeStartDate: number,
-    rangeEndDate: number
+    rangeEndDate: number,
+    firstDataRequest: boolean
   ): Promise<GetBarsResult> {
     const requestParams: RequestParams = {
       symbol: symbolInfo.ticker || "",
       resolution: resolution,
       from: rangeStartDate,
-      to: rangeEndDate
+      to: rangeEndDate,
+      firstDataRequest: firstDataRequest
     };
 
     return new Promise(
@@ -81,54 +83,6 @@ export class HistoryProvider {
             requestParams
           )
           .then((response: GetBarsResult) => {
-            // if (response.s !== "ok" && response.s !== "no_data") {
-            //   reject(response.errmsg);
-            //   return;
-            // }
-
-            // const bars: Bar[] = [];
-            // const meta: HistoryMetadata = {
-            //   noData: false
-            // };
-
-            // if (response.s === "no_data") {
-            //   meta.noData = true;
-            //   meta.nextTime = response.nextTime;
-            // } else {
-            //   const volumePresent = response.v !== undefined;
-            //   const ohlPresent = response.o !== undefined;
-
-            //   for (let i = 0; i < response.t.length; ++i) {
-            //     const barValue: Bar = {
-            //       time: response.t[i] * 1000,
-            //       close: Number(response.c[i]),
-            //       open: Number(response.c[i]),
-            //       high: Number(response.c[i]),
-            //       low: Number(response.c[i])
-            //     };
-
-            //     if (ohlPresent) {
-            //       barValue.open = Number(
-            //         (response as HistoryFullDataResponse).o[i]
-            //       );
-            //       barValue.high = Number(
-            //         (response as HistoryFullDataResponse).h[i]
-            //       );
-            //       barValue.low = Number(
-            //         (response as HistoryFullDataResponse).l[i]
-            //       );
-            //     }
-
-            //     if (volumePresent) {
-            //       barValue.volume = Number(
-            //         (response as HistoryFullDataResponse).v[i]
-            //       );
-            //     }
-
-            //     bars.push(barValue);
-            //   }
-            // }
-
             resolve({
               bars: response.bars,
               meta: response.meta

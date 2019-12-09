@@ -118,12 +118,6 @@ export class UDFCompatibleDatafeed
 
   private readonly _requester: Requester;
 
-  protected status: Status;
-
-  protected barsData: Bar[];
-
-  protected awaitCount: number;
-
   protected constructor(
     datafeedURL: string,
     quotesProvider: IQuotesProvider,
@@ -141,12 +135,6 @@ export class UDFCompatibleDatafeed
     );
     this._quotesPulseProvider = new QuotesPulseProvider(this._quotesProvider);
 
-    this.status = Status.LOADING;
-
-    this.barsData = [];
-
-    this.awaitCount = 0;
-
     this._configurationReadyPromise = this._requestConfiguration().then(
       (configuration: UdfCompatibleConfiguration | null) => {
         if (configuration === null) {
@@ -158,34 +146,8 @@ export class UDFCompatibleDatafeed
     );
   }
 
-  public changeBarsData(data: GetBarsResult) {
-    this.barsData = data.bars;
-    this.status = Status.COMPLETE;
-  }
-
   public updateData(data: GetBarsResult) {
     this._dataPulseProvider._updateData(data);
-  }
-
-  /**
-   * 异步延迟等待
-   */
-  public delayAwait(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.awaitCount++;
-      logMessage(
-        `UdfCompatibleDatafeed: Await count:: ${this.awaitCount * 300}ms`
-      );
-      if (this.status === Status.COMPLETE) {
-        return resolve(this.barsData);
-      } else {
-        return this.awaitCount < 100 ? reject() : resolve();
-      }
-    }).catch(() => {
-      return new Promise(resolve => {
-        setTimeout(resolve, 300);
-      }).then(() => this.delayAwait());
-    });
   }
 
   public onReady(callback: OnReadyCallback): void {
@@ -458,19 +420,13 @@ export class UDFCompatibleDatafeed
     rangeStartDate: number,
     rangeEndDate: number,
     onResult: HistoryCallback,
-    onError: ErrorCallback
+    onError: ErrorCallback,
+    firstDataRequest: boolean // 标识是否第一次调用此商品/周期的历史记录
   ): void {
     this._historyProvider
-      .getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
+      .getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate, firstDataRequest)
       .then((result: GetBarsResult) => {
         onResult(result.bars, result.meta);
-        // if (this.status === Status.COMPLETE) {
-        //   this.status = Status.LOADING;
-        // }
-        // this.delayAwait().then((result: Bar[]) => {
-        //   onResult(result, { noData: !result.length });
-        //   this.awaitCount = 0;
-        // });
       })
       .catch(onError);
   }

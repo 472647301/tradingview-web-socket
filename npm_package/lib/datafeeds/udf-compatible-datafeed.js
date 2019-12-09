@@ -25,9 +25,6 @@ var UDFCompatibleDatafeed = /** @class */ (function () {
         this._quotesProvider = quotesProvider;
         this._dataPulseProvider = new data_pulse_provider_1.DataPulseProvider(this._historyProvider, updateFrequency);
         this._quotesPulseProvider = new quotes_pulse_provider_1.QuotesPulseProvider(this._quotesProvider);
-        this.status = 0 /* LOADING */;
-        this.barsData = [];
-        this.awaitCount = 0;
         this._configurationReadyPromise = this._requestConfiguration().then(function (configuration) {
             if (configuration === null) {
                 configuration = defaultConfiguration();
@@ -35,32 +32,8 @@ var UDFCompatibleDatafeed = /** @class */ (function () {
             _this._setupWithConfiguration(configuration);
         });
     }
-    UDFCompatibleDatafeed.prototype.changeBarsData = function (data) {
-        this.barsData = data.bars;
-        this.status = 1 /* COMPLETE */;
-    };
     UDFCompatibleDatafeed.prototype.updateData = function (data) {
         this._dataPulseProvider._updateData(data);
-    };
-    /**
-     * 异步延迟等待
-     */
-    UDFCompatibleDatafeed.prototype.delayAwait = function () {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            _this.awaitCount++;
-            helpers_1.logMessage("UdfCompatibleDatafeed: Await count:: " + _this.awaitCount * 300 + "ms");
-            if (_this.status === 1 /* COMPLETE */) {
-                return resolve(_this.barsData);
-            }
-            else {
-                return _this.awaitCount < 100 ? reject() : resolve();
-            }
-        }).catch(function () {
-            return new Promise(function (resolve) {
-                setTimeout(resolve, 300);
-            }).then(function () { return _this.delayAwait(); });
-        });
     };
     UDFCompatibleDatafeed.prototype.onReady = function (callback) {
         var _this = this;
@@ -231,18 +204,12 @@ var UDFCompatibleDatafeed = /** @class */ (function () {
                 .catch(onError);
         }
     };
-    UDFCompatibleDatafeed.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError) {
+    UDFCompatibleDatafeed.prototype.getBars = function (symbolInfo, resolution, rangeStartDate, rangeEndDate, onResult, onError, firstDataRequest // 标识是否第一次调用此商品/周期的历史记录
+    ) {
         this._historyProvider
-            .getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate)
+            .getBars(symbolInfo, resolution, rangeStartDate, rangeEndDate, firstDataRequest)
             .then(function (result) {
             onResult(result.bars, result.meta);
-            // if (this.status === Status.COMPLETE) {
-            //   this.status = Status.LOADING;
-            // }
-            // this.delayAwait().then((result: Bar[]) => {
-            //   onResult(result, { noData: !result.length });
-            //   this.awaitCount = 0;
-            // });
         })
             .catch(onError);
     };
