@@ -126,7 +126,8 @@ class KlineChart extends Vue {
           params.symbol,
           params.resolution,
           params.from,
-          params.to
+          params.to,
+          params.firstDataRequest
         ).then(d => d)
       },
       config: () => this.defaultConfig(),
@@ -174,8 +175,10 @@ class KlineChart extends Vue {
     symbol: string,
     resolution: string,
     from: number,
-    to: number
+    to: number,
+    isFirst: boolean
   ) {
+    console.log('----isFirst----', isFirst)
     if (this.resolution !== resolution && this.socket) {
       this.socket.send(
         JSON.stringify({
