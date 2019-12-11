@@ -9494,10 +9494,10 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
-trader-view@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/trader-view/-/trader-view-1.1.3.tgz#742d54e9ad0b0fabf3dc09ce9007db3a73ff31ed"
-  integrity sha512-GsBQ4bxAxvfpIEsmwwQRPVEvDzkjO/pWB4TDfh0UK55SgGZ7/oI0+NaDSj336dsQIQNPlF6aE5sFPVVhq+maSA==
+trader-view@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/trader-view/-/trader-view-1.1.5.tgz#0577a455a0c18743adb68ac0fe67a0c166042887"
+  integrity sha512-te7xOn7tsDPIe3F5vbT0rHFVyY0Qx8to74zrJijHKr0QsxCW2vDj88Z5kPzqRKFfNW7z2ZljiN6z4un7HP4tpw==
   dependencies:
     charting_library "^1.0.1"
 

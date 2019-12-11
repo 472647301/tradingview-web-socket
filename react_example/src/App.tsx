@@ -11,18 +11,18 @@ class App extends React.Component<IProps> {
   public socket?: WebSocket
 
   public state = {
-    interval: '15'
+    interval: '1440'
   }
 
   /**
    * 初始化WebSocket
    */
   public initWebSocket() {
-    // const url = 'wss://realtime1.tdex.com/realtime'
-    // this.socket = new WebSocket(url)
-    // this.socket.onmessage = e => {
-    //   this.onSocketMessage(e.data)
-    // }
+    const url = 'wss://realtime1.tdex.com/realtime'
+    this.socket = new WebSocket(url)
+    this.socket.onmessage = e => {
+      this.onSocketMessage(e.data)
+    }
   }
 
   /**
@@ -32,7 +32,10 @@ class App extends React.Component<IProps> {
   public onSocketMessage(msg: string) {
     try {
       const _msg = JSON.parse(msg)
-      console.log(_msg)
+      if (_msg && _msg.data && _msg.data[0] && _msg.data[0].data) {
+        const _list = _msg.data[0].data
+        
+      }
     } catch (err) {
       console.error(err)
     }
@@ -48,13 +51,14 @@ class App extends React.Component<IProps> {
           params.symbol,
           params.resolution,
           params.from,
-          params.to
+          params.to,
+          params.firstDataRequest
         )
       },
       config: () => new Promise(resolve => resolve({
         supports_search: true,
         supports_group_request: false,
-        supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M'],
+        supported_resolutions: ['1', '5', '15', '30', '60', '1440', '10080', '302400'],
         supports_marks: false,
         supports_timescale_marks: false,
         supports_time: false
@@ -72,7 +76,12 @@ class App extends React.Component<IProps> {
         pricescale: 100,
         minmov: 1,
         has_intraday: true,
-        supported_resolutions: ['1', '5', '15', '30', '60', 'D', 'W', 'M']
+        has_no_volume: false,
+        has_daily: true,
+        has_weekly_and_monthly: true,
+        has_empty_bars: true,
+        supported_resolutions: ['1', '5', '15', '30', '60', '1440', '10080', '302400'],
+        intraday_multipliers: ['1', '5', '15', '30', '60', '1440', '10080', '302400']
       }))
     })
   }
@@ -80,13 +89,19 @@ class App extends React.Component<IProps> {
   /**
    * 获取历史数据
    */
-  public async fetchHistoryData(symbol: string, period: string, from: number, to: number) {
+  public async fetchHistoryData(symbol: string, period: string, from: number, to: number, isFirst:boolean) {
     const { interval } = this.state
     if (interval !== period) {
       // 退订
-      // 订阅
+      if (this.socket) {
+        this.socket.send(JSON.stringify({
+          op: "unsubscribe",
+          args: ["scfd/kline/1MIN:BTCUSDT"]
+        }))
+      }
       this.setState({ interval: period })
     }
+    console.log('----', PERIOD[period], period)
     const res = await axios.post<IApi<DataT>>('/v1/exchange/ticker/getScaleByDate', {
       from: from,
       symbol: "btcusdt",
@@ -106,6 +121,12 @@ class App extends React.Component<IProps> {
           volume: _list[i].volume
         })
       }
+    }
+    if (isFirst && this.socket) {
+      this.socket.send(JSON.stringify({
+        op: "subscribe",
+        args: ["scfd/kline/1MIN:BTCUSDT"]
+      }))
     }
     return {
       bars: list,
