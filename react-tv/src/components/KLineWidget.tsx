@@ -52,6 +52,7 @@ export class KLineWidget extends React.Component<Props> {
         format: "price",
         pricescale: Math.pow(10, 2),
         minmov: 1,
+        volume_precision: 10,
         has_intraday: true,
         supported_resolutions: ["1", "5", "15", "30", "60", "D", "1W", "1M"],
       });
