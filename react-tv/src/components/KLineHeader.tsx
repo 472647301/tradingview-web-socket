@@ -3,7 +3,8 @@ import { makeStyles, Button } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    flex: 0.3,
+    height: window.innerHeight,
+    overflow: "scroll",
     "& > *": {
       margin: theme.spacing(1),
     },
@@ -29,6 +30,7 @@ export const KLineHeader = (props: Props) => {
         return (
           <Button
             key={e.name}
+            size={"small"}
             variant="outlined"
             color={isActive ? "secondary" : "primary"}
             onClick={() => onClick(e.name)}

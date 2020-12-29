@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-react-tv/public/TradingView/*
+react-tv/public/charting_library/*
 
 # local env files
 .env.local

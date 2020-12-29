@@ -118,8 +118,11 @@ class TvWebSocket {
       delete this.success[name];
       return;
     }
+    const unsub = JSON.parse(this.success[name]);
+    unsub.cmd = "unsub";
+    this.ws.send(JSON.stringify(unsub));
     this.evt.removeAllListeners(name);
-    console.log(` >> WebSocket send: ${this.success[name]}`);
+    console.log(` >> WebSocket send: ${JSON.stringify(unsub)}`);
     delete this.success[name];
   }
 

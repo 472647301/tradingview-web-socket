@@ -26,26 +26,20 @@ const intervalMap = {
 type Props = {
   symbol: string;
 };
-type State = {
-  interval: keyof typeof intervalMap;
-};
-export class KLineWidget extends React.Component<Props, State> {
+
+type IntervalT = keyof typeof intervalMap;
+export class KLineWidget extends React.Component<Props> {
+  private symbol = this.props.symbol;
+  private interval: IntervalT = "M5";
   private _widget?: IChartingLibraryWidget;
   private datafeed = new DataFeed({
     getBars: (params) => this.getBars(params),
     fetchResolveSymbol: () => this.resolveSymbol(),
   });
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      interval: "M5",
-    };
-  }
-
   public resolveSymbol = () => {
     return new Promise<LibrarySymbolInfo>((resolve) => {
-      const { symbol } = this.props;
+      const symbol = this.symbol;
       resolve({
         name: symbol.toLocaleUpperCase(),
         full_name: symbol.toLocaleUpperCase(),
@@ -65,12 +59,18 @@ export class KLineWidget extends React.Component<Props, State> {
   };
 
   public getBars = async (params: GetBarsParams) => {
-    const { symbol } = this.props;
-    const { interval } = this.state;
-    console.log("--------", params);
+    const symbol = this.symbol;
+    if (params.resolution !== intervalMap[this.interval]) {
+      this.unsubscribeKLine();
+      for (let key in intervalMap) {
+        if (intervalMap[key as IntervalT] === params.resolution) {
+          this.interval = key as IntervalT;
+        }
+      }
+    }
     const res = await apiGet<Array<IApiCandles>>(
       "market_candles",
-      `/${interval}/${symbol}`,
+      `/${this.interval}/${symbol}`,
       {
         params: {
           before: params.to,
@@ -79,30 +79,14 @@ export class KLineWidget extends React.Component<Props, State> {
       }
     );
     if (
-      params.resolution === intervalMap[interval] &&
+      params.resolution === intervalMap[this.interval] &&
       params.firstDataRequest &&
       res &&
       res.data.length
     ) {
-      ws.subscribe(
-        `candle.${interval}.${symbol}`,
-        {
-          cmd: "sub",
-          args: [`candle.${interval}.${symbol}`],
-          id: "react-tv",
-        },
-        (data: IApiCandles) => {
-          this.datafeed.updateKLine({
-            time: data.id * 1000,
-            open: data.open,
-            high: data.high,
-            low: data.low,
-            close: data.close,
-            volume: data.base_vol,
-          });
-        }
-      );
+      this.subscribeKLine();
     }
+
     if (!res || !res.data || !res.data.length) {
       return {
         bars: [],
@@ -130,32 +114,55 @@ export class KLineWidget extends React.Component<Props, State> {
     };
   };
 
+  public subscribeKLine = () => {
+    const symbol = this.symbol;
+    ws.subscribe(
+      `candle.${this.interval}.${symbol}`,
+      {
+        cmd: "sub",
+        args: [`candle.${this.interval}.${symbol}`],
+        id: "react-tv",
+      },
+      (data: IApiCandles) => {
+        this.datafeed.updateKLine({
+          time: data.id * 1000,
+          open: data.open,
+          high: data.high,
+          low: data.low,
+          close: data.close,
+          volume: data.base_vol,
+        });
+      }
+    );
+  };
+
+  public unsubscribeKLine = () => {
+    const symbol = this.symbol;
+    ws.unsubscribe(`candle.${this.interval}.${symbol}`);
+  };
+
   public initTradingView = () => {
-    const { symbol } = this.props;
-    const { interval } = this.state;
+    const symbol = this.symbol;
     this._widget = new widget({
       // debug: true,
       fullscreen: true,
       symbol: symbol.toLocaleUpperCase(),
-      interval: intervalMap[interval],
+      interval: intervalMap[this.interval],
       container_id: "tv_chart_container",
       datafeed: this.datafeed,
-      // library_path: "http://49.233.210.12/TradingView/",
-      library_path: "/TradingView/",
+      library_path: "/charting_library/",
       locale: "zh",
       theme: "Dark",
       timezone: "Asia/Shanghai",
     });
-    // this._widget.onChartReady(() => {
-    //   if (!this._widget) {
-    //     return;
-    //   }
-    //   const activeChart = this._widget.activeChart();
-    //   const intervalChanged = activeChart.onIntervalChanged();
-    //   intervalChanged.subscribe(null, (interval, timeframeObj) => {
-    //     console.log("---subscribe----", interval, timeframeObj);
-    //   });
-    // });
+  };
+
+  public setSymbol = (symbol: string) => {
+    this.unsubscribeKLine();
+    this.symbol = symbol;
+    this._widget?.setSymbol(symbol, intervalMap[this.interval], () => {
+      console.log("------setSymbol---------");
+    });
   };
 
   public componentDidMount() {
