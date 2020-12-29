@@ -10781,6 +10781,11 @@ tr46@^2.0.2:
   dependencies:
     punycode "^2.1.1"
 
+tradingview-api@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tradingview-api/-/tradingview-api-1.0.0.tgz#23d8e23cdee30fc3d1c7daca6b54732d4749f22e"
+  integrity sha512-SiQAXjNd+gOIza33NPLA7/YyAwFyYsQ+Tfh9R34CxTZ+qBlc80iMTDoPejpj7E1wTNvGBjCtSaj+BV4kFo4tww==
+
 tryer@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/tryer/-/tryer-1.0.1.tgz#f2c85406800b9b0f74c9f7465b81eaad241252f8"

@@ -1,11 +1,12 @@
 import * as React from "react";
 import { apiGet } from "../api";
-import { DataFeed, widget, GetBarsParams } from "../datafeed/datafeed";
+// import { DataFeed, widget, GetBarsParams } from "../datafeed/datafeed";
+import { DataFeed, widget, GetBarsParams } from "tradingview-api";
 import {
   IChartingLibraryWidget,
   Bar,
   LibrarySymbolInfo,
-} from "../datafeed/library.min";
+} from "tradingview-api/lib/library.min";
 import { ws } from "../utils/socket";
 
 /**
