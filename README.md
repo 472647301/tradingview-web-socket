@@ -1,41 +1,43 @@
 # 2020-12-30
 
-### 如需浏览旧版，请切换分支查看
+English | [简体中文](./README-zh_CN.md)
+
+### To browse the old version, please switch branches to view
 
 ## tradingview-api
-_typescript项目可以直接复制[datafeed](https://github.com/472647301/tradingview-web-socket/tree/master/react-tv/src/datafeed)文件内容进行使用或二次开发，javascript项目可以通过以下包名安装：_
+_The Typescript project can directly copy the content of the [datafeed](https://github.com/472647301/tradingview-web-socket/tree/master/react-tv/src/datafeed) file for use or secondary development, and the Javascript project can be installed by the following package name:_
 ```shell
 yarn add tradingview-api
 ```
 ## Example
 [Vue Example](https://github.com/472647301/tradingview-web-socket/tree/master/vue-tv)
 [React Example](https://github.com/472647301/tradingview-web-socket/tree/master/react-tv)
-[预览地址](http://49.233.210.12/vite/index.html/) 
+[Preview address](http://49.233.210.12/vite/index.html/) 
 
 ## Screenshot
 <img src="https://github.com/472647301/tradingview-web-socket/blob/master/screenshot/screenshot.png?raw=true" width="1038">
 
-## 运行 React demo
+## Run React demo
 
-_接口数据来自[fcoin](https://doc.fcoin.pro/zh.html?javascript#websocket)需要翻墙才能正常访问_
+_Interface data comes from[fcoin](https://doc.fcoin.pro/zh.html?javascript#websocket)_
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
 cd tradingview-web-socket
-// 复制tradingview-web-socket目录下charting_library文件到tradingview-web-socket/react-tv/public目录下
+// Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/vue-tv/public directory
 cd react-tv
 yarn 
 yarn start
 ```
 
-## 运行 Vue demo
+## Run Vue demo
 
-_接口数据来自[fcoin](https://doc.fcoin.pro/zh.html?javascript#websocket)需要翻墙才能正常访问_
+_Interface data comes from[fcoin](https://doc.fcoin.pro/zh.html?javascript#websocket)_
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
 cd tradingview-web-socket
-// 复制tradingview-web-socket目录下charting_library文件到tradingview-web-socket/vue-tv/public目录下
+// Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/vue-tv/public directory
 cd vue-tv
 yarn 
 yarn dev
