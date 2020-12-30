@@ -12,6 +12,7 @@ export default defineComponent({
 
     const onClick = (name: string) => {
       symbol.value = name;
+      // 暂时没搞明白defineComponent组件，先用event事件实现
       ws.evt.emit("onChangeSymbol", name);
     };
 
