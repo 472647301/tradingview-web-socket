@@ -15,7 +15,9 @@ yarn add tradingview-api
 ## Example
 
 [Vue Example](https://github.com/472647301/tradingview-web-socket/tree/master/vue-javascript-demo)
+
 [React Example](https://github.com/472647301/tradingview-web-socket/tree/master/react-typescript-demo)
+
 [Preview address](http://49.233.210.12)
 
 ## Screenshot
@@ -24,7 +26,7 @@ yarn add tradingview-api
 
 ## Run React demo
 
-_Interface data comes from[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
+_Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
@@ -37,7 +39,7 @@ yarn start
 
 ## Run Vue demo
 
-_Interface data comes from[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
+_Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
