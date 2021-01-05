@@ -1,18 +1,18 @@
 import { https } from "./axios";
 import { AxiosRequestConfig } from "axios";
 
-// export const BASE_URL = "https://api.fcoin.pro/v2";
-export const BASE_URL = "/api";
+// export const BASE_URL = "/api";
+export const BASE_URL = "https://api.huobi.pro";
 
 export const API_URL = {
   /**
-   * 查询可用交易对
+   * 交易对
    */
-  public_symbols: "/public/symbols",
+  common_symbols: "/v1/common/symbols",
   /**
-   * 获取 Candle 信息
+   * K线数据
    */
-  market_candles: "/market/candles",
+  history_kline: "/market/history/kline",
 };
 
 export type UrlT = keyof typeof API_URL;

@@ -1,16 +1,18 @@
+import pako from "pako";
 import dayJS from "dayjs";
 import { EventEmitter } from "events";
 
 class TvWebSocket {
-  private url = "wss://api.fcoin.pro/v2/ws";
+  private url = "wss://api.huobi.pro/ws";
   private ws: WebSocket | null = null;
   private success: IUtilsMap<string> = {};
   private failure: IUtilsMap<string> = {};
   private timer: NodeJS.Timeout | null = null;
-  public evt = new EventEmitter();
+  private evt = new EventEmitter();
 
   public initWebSocket() {
     this.ws = new WebSocket(this.url);
+    this.ws.binaryType = "arraybuffer";
     this.ws.onopen = this.onopen.bind(this);
     this.ws.onclose = this.onclose.bind(this);
     this.ws.onerror = this.onerror.bind(this);
@@ -42,15 +44,6 @@ class TvWebSocket {
       console.log(` >> WebSocket send: ${this.failure[key]}`);
     }
     this.failure = {};
-    setInterval(() => {
-      this.ws?.send(
-        JSON.stringify({
-          cmd: "ping",
-          args: [Date.now()],
-          id: "react-tv",
-        })
-      );
-    }, 10000);
   }
 
   private onclose() {
@@ -65,27 +58,34 @@ class TvWebSocket {
     console.log(" >> Websocket Error...", event);
   }
 
-  private onmessage(event: MessageEvent) {
-    try {
-      if (!event.data) {
-        return;
-      }
-      const data = JSON.parse(event.data);
-      if (data.type === "ping") {
-        return;
-      }
-      this.onBroadcast(data);
-    } catch (e) {}
+  private onmessage(event: MessageEvent<string>) {
+    if (!event.data) {
+      return;
+    }
+    const text = pako.inflate(event.data, {
+      to: "string",
+    });
+    const data = JSON.parse(text);
+    // console.log("---inflate----", data);
+    if (data && data.ping) {
+      this.ws?.send(
+        JSON.stringify({
+          pong: Date.now(),
+        })
+      );
+      return;
+    }
+    this.onBroadcast(data);
   }
 
   /**
    * 广播通知
    */
   private onBroadcast(msg: any) {
-    if (!this.success[msg.type]) {
+    if (!this.success[msg.ch]) {
       return;
     }
-    this.evt.emit(msg.type, msg);
+    this.evt.emit(msg.ch, msg);
   }
 
   public subscribe(

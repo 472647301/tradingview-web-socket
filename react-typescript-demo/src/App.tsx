@@ -9,6 +9,7 @@ import { ws } from "./utils/socket";
 type Props = {};
 type State = {
   symbol: string;
+  symbolInfo?: IApiSymbols;
   symbolList: IApiSymbols[];
 };
 class App extends React.Component<Props, State> {
@@ -16,24 +17,38 @@ class App extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      symbol: "btcusdt",
+      symbol: "",
+      symbolInfo: void 0,
       symbolList: [],
     };
   }
 
   public fetchSymbolList() {
-    apiGet<IApiSymbols[]>("public_symbols").then((res) => {
+    apiGet<IApiSymbols[]>("common_symbols").then((res) => {
       if (!res || !res.data) {
         return;
       }
+      const list: IApiSymbols[] = [];
+      for (let i = 0; i < res.data.length; i++) {
+        if (res.data[i]["quote-currency"] === "usdt") {
+          list.push(res.data[i]);
+        }
+      }
+      const symbol = list.length ? list[0].symbol : "";
       this.setState({
-        symbolList: res.data,
+        symbol: symbol,
+        symbolInfo: list[0],
+        symbolList: list,
       });
     });
   }
 
   public setSymbol = (symbol: string) => {
-    this.setState({ symbol });
+    const symbolInfo = this.state.symbolList.find((e) => e.symbol === symbol);
+    if (!symbolInfo) {
+      return;
+    }
+    this.setState({ symbol, symbolInfo });
     this.klineRfe?.setSymbol(symbol);
   };
 
@@ -43,7 +58,7 @@ class App extends React.Component<Props, State> {
   }
 
   public render() {
-    const { symbol, symbolList } = this.state;
+    const { symbol, symbolInfo, symbolList } = this.state;
     return (
       <div className="App">
         <Grid container spacing={1}>
@@ -58,10 +73,12 @@ class App extends React.Component<Props, State> {
           </Grid>
           <Grid item xs={10}>
             <Paper>
-              <KLineWidget
-                symbol={symbol}
-                ref={(ref) => (this.klineRfe = ref)}
-              />
+              {symbolInfo && (
+                <KLineWidget
+                  symbolInfo={symbolInfo}
+                  ref={(ref) => (this.klineRfe = ref)}
+                />
+              )}
             </Paper>
           </Grid>
         </Grid>

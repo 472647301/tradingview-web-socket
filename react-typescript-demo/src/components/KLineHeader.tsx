@@ -23,20 +23,20 @@ export const KLineHeader = (props: Props) => {
   return (
     <div className={classes.root}>
       {symbols.map((e) => {
-        if (!e.tradable) {
+        if (e.state !== "online") {
           return null;
         }
-        const isActive = name === e.name;
+        const isActive = name === e.symbol;
         return (
           <Button
-            key={e.name}
+            key={e.symbol}
             size={"small"}
             variant="outlined"
             color={isActive ? "secondary" : "primary"}
-            onClick={() => onClick(e.name)}
+            onClick={() => onClick(e.symbol)}
           >
-            {e.base_currency.toLocaleUpperCase()}/
-            {e.quote_currency.toLocaleUpperCase()}
+            {e["base-currency"].toLocaleUpperCase()}/
+            {e["quote-currency"].toLocaleUpperCase()}
           </Button>
         );
       })}

@@ -13,25 +13,27 @@ import { ws } from "../utils/socket";
  * @key Server 端定义字段
  * @value value 对应 DataFeed.configuration.supported_resolutions
  */
+// 1min, 5min, 15min, 30min, 60min, 4hour, 1day, 1mon, 1week, 1year
 const intervalMap = {
-  M1: "1",
-  M5: "5",
-  M15: "15",
-  M30: "30",
-  H1: "60",
-  D1: "1D",
-  W1: "1W",
-  MN: "1M",
+  "1min": "1",
+  "5min": "5",
+  "15min": "15",
+  "30min": "30",
+  "60min": "60",
+  "4hour": "240",
+  "1day": "1D",
+  "1mon": "1W",
+  "1week": "1M",
 };
 
 type Props = {
-  symbol: string;
+  symbolInfo: IApiSymbols;
 };
 
 type IntervalT = keyof typeof intervalMap;
 export class KLineWidget extends React.Component<Props> {
-  private symbol = this.props.symbol;
-  private interval: IntervalT = "M5";
+  private symbol = this.props.symbolInfo.symbol;
+  private interval: IntervalT = "5min";
   private _widget?: IChartingLibraryWidget;
   private datafeed = new DataFeed({
     getBars: (params) => this.getBars(params),
@@ -41,27 +43,39 @@ export class KLineWidget extends React.Component<Props> {
   public resolveSymbol = () => {
     return new Promise<LibrarySymbolInfo>((resolve) => {
       const symbol = this.symbol;
+      const info = this.props.symbolInfo;
       resolve({
         name: symbol.toLocaleUpperCase(),
         full_name: symbol.toLocaleUpperCase(),
         description: symbol.toLocaleUpperCase(),
         type: symbol,
         session: "24x7",
-        exchange: "BTB",
+        exchange: "HuoBi",
         listed_exchange: symbol,
         timezone: "Asia/Shanghai",
         format: "price",
-        pricescale: Math.pow(10, 2),
+        pricescale: Math.pow(10, info["price-precision"]),
         minmov: 1,
-        volume_precision: 10,
+        volume_precision: info["value-precision"],
         has_intraday: true,
-        supported_resolutions: ["1", "5", "15", "30", "60", "D", "1W", "1M"],
+        supported_resolutions: [
+          "1",
+          "5",
+          "15",
+          "30",
+          "60",
+          "240",
+          "D",
+          "1W",
+          "1M",
+        ],
       });
     });
   };
 
   public getBars = async (params: GetBarsParams) => {
     const symbol = this.symbol;
+    const size = window.innerWidth;
     if (params.resolution !== intervalMap[this.interval]) {
       this.unsubscribeKLine();
       for (let key in intervalMap) {
@@ -70,16 +84,13 @@ export class KLineWidget extends React.Component<Props> {
         }
       }
     }
-    const res = await apiGet<Array<IApiCandles>>(
-      "market_candles",
-      `/${this.interval}/${symbol}`,
-      {
-        params: {
-          before: params.to,
-          limit: window.innerWidth || 1000,
-        },
-      }
-    );
+    const res = await apiGet<Array<IApiKLine>>("history_kline", void 0, {
+      params: {
+        symbol: symbol,
+        period: this.interval,
+        size: size > 2000 ? 2000 : size,
+      },
+    });
     if (
       params.resolution === intervalMap[this.interval] &&
       params.firstDataRequest &&
@@ -104,7 +115,7 @@ export class KLineWidget extends React.Component<Props> {
         high: item.high,
         low: item.low,
         close: item.close,
-        volume: item.base_vol,
+        volume: item.vol,
       });
     }
     list.sort((l, r) => (l.time > r.time ? 1 : -1));
@@ -119,20 +130,20 @@ export class KLineWidget extends React.Component<Props> {
   public subscribeKLine = () => {
     const symbol = this.symbol;
     ws.subscribe(
-      `candle.${this.interval}.${symbol}`,
+      `market.${symbol}.kline.${this.interval}`,
       {
-        cmd: "sub",
-        args: [`candle.${this.interval}.${symbol}`],
         id: "react-tv",
+        sub: `market.${symbol}.kline.${this.interval}`,
       },
-      (data: IApiCandles) => {
+      (data) => {
+        const tick = data.tick as IApiKLine;
         this.datafeed.updateKLine({
-          time: data.id * 1000,
-          open: data.open,
-          high: data.high,
-          low: data.low,
-          close: data.close,
-          volume: data.base_vol,
+          time: tick.id * 1000,
+          open: tick.open,
+          high: tick.high,
+          low: tick.low,
+          close: tick.close,
+          volume: tick.vol,
         });
       }
     );
@@ -140,7 +151,7 @@ export class KLineWidget extends React.Component<Props> {
 
   public unsubscribeKLine = () => {
     const symbol = this.symbol;
-    ws.unsubscribe(`candle.${this.interval}.${symbol}`);
+    ws.unsubscribe(`market.${symbol}.kline.${this.interval}`);
   };
 
   public initTradingView = () => {
@@ -163,7 +174,7 @@ export class KLineWidget extends React.Component<Props> {
     this.unsubscribeKLine();
     this.symbol = symbol;
     this._widget?.setSymbol(symbol, intervalMap[this.interval], () => {
-      console.log("------setSymbol---------");
+      // console.log("------setSymbol---------");
     });
   };
 
