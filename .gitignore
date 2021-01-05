@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 react-typescript-demo/public/charting_library/*
-vue-typescript-demo/public/charting_library/*
+vue-javascript-demo/public/charting_library/*
 
 # local env files
 .env.local
