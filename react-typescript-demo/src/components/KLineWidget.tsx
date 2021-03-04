@@ -9,9 +9,21 @@ import {
 } from "tradingview-api/lib/library.min";
 import { ws } from "../utils/socket";
 
+const supported_resolutions = [
+  "1",
+  "5",
+  "15",
+  "30",
+  "60",
+  "240",
+  "D",
+  "W",
+  "M",
+];
+
 /**
  * @key Server 端定义字段
- * @value value 对应 DataFeed.configuration.supported_resolutions
+ * @value value 对应 supported_resolutions
  */
 // 1min, 5min, 15min, 30min, 60min, 4hour, 1day, 1mon, 1week, 1year
 const intervalMap = {
@@ -21,9 +33,9 @@ const intervalMap = {
   "30min": "30",
   "60min": "60",
   "4hour": "240",
-  "1day": "1D",
-  "1mon": "1W",
-  "1week": "1M",
+  "1day": "D",
+  "1week": "W",
+  "1mon": "M",
 };
 
 type Props = {
@@ -38,6 +50,13 @@ export class KLineWidget extends React.Component<Props> {
   private datafeed = new DataFeed({
     getBars: (params) => this.getBars(params),
     fetchResolveSymbol: () => this.resolveSymbol(),
+    fetchConfiguration: () => {
+      return new Promise((resolve) => {
+        resolve({
+          supported_resolutions: supported_resolutions,
+        });
+      });
+    },
   });
 
   public resolveSymbol = () => {
@@ -58,17 +77,7 @@ export class KLineWidget extends React.Component<Props> {
         minmov: 1,
         volume_precision: info["value-precision"],
         has_intraday: true,
-        supported_resolutions: [
-          "1",
-          "5",
-          "15",
-          "30",
-          "60",
-          "240",
-          "D",
-          "1W",
-          "1M",
-        ],
+        supported_resolutions: supported_resolutions,
       });
     });
   };
@@ -76,6 +85,15 @@ export class KLineWidget extends React.Component<Props> {
   public getBars = async (params: GetBarsParams) => {
     const symbol = this.symbol;
     const size = window.innerWidth;
+    if (!params.firstDataRequest /**是否第一次请求历史数据 */) {
+      // 火币接口暂时不支持分段查询历史数据
+      return {
+        bars: [],
+        meta: {
+          noData: true,
+        },
+      };
+    }
     if (params.resolution !== intervalMap[this.interval]) {
       this.unsubscribeKLine();
       for (let key in intervalMap) {
