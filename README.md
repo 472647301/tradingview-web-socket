@@ -1,6 +1,6 @@
-# 2020-12-30
+# 2021-03-12
 
-English | [简体中文](./README-zh_CN.md)
+English | [简体中文](./README-zh_CN.md) | [繁體中文](./README-zh_TW.md)
 
 ### To browse the old version, please switch branches to view
 
@@ -46,6 +46,18 @@ git clone https://github.com/472647301/tradingview-web-socket
 cd tradingview-web-socket
 // Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/vue-javascript-demo/public directory
 cd vue-javascript-demo
+yarn install
+yarn serve
+```
+## Run Vue3 demo
+
+_Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
+
+```shell
+git clone https://github.com/472647301/tradingview-web-socket
+cd tradingview-web-socket
+// Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/vue-javascript-demo/public directory
+cd vue3-javascript-demo
 yarn install
 yarn serve
 ```
