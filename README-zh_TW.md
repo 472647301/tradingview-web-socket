@@ -19,7 +19,7 @@ yarn add tradingview-api
 [React Example](https://github.com/472647301/tradingview-web-socket/tree/master/react-typescript-demo)
 
 
-[预览地址](http://49.233.210.12)
+[预览地址](http://demo.zhuwenbo.top/tradingview/react/)
 
 ## Screenshot
 
