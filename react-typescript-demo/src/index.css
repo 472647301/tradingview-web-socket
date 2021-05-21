@@ -6,3 +6,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+#tv_chart_container iframe {
+  width: 100%;
+  height: 100%;
+}
+.kline-list {
+  height: 40px;
+  display: flex;
+}
+.kline-item {
+  flex: 1;
+  line-height: 40px;
+  text-align: center;
+}

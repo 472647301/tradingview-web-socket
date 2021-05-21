@@ -1,45 +1,45 @@
-import * as React from "react";
-import { makeStyles, Button } from "@material-ui/core";
+import React from "react";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import IconButton from "@material-ui/core/IconButton";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import MenuIcon from "@material-ui/icons/Menu";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    height: window.innerHeight,
-    overflow: "scroll",
-    "& > *": {
-      margin: theme.spacing(1),
-    },
+    flexGrow: 1,
+  },
+  menu: {
+    marginRight: theme.spacing(2),
   },
 }));
 
 type Props = {
-  name: string;
-  symbols: IApiSymbols[];
-  onClick: (name: string) => void;
+  title: string;
+  onClick: () => void;
 };
-export const KLineHeader = (props: Props) => {
-  const classes = useStyles();
-  const { name, symbols, onClick } = props;
+export function KLineHeader(props: Partial<Props>) {
+  const styles = useStyles();
 
   return (
-    <div className={classes.root}>
-      {symbols.map((e) => {
-        if (e.state !== "online") {
-          return null;
-        }
-        const isActive = name === e.symbol;
-        return (
-          <Button
-            key={e.symbol}
-            size={"small"}
-            variant="outlined"
-            color={isActive ? "secondary" : "primary"}
-            onClick={() => onClick(e.symbol)}
+    <div className={styles.root}>
+      <AppBar position="static">
+        <Toolbar variant="dense">
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            className={styles.menu}
+            onClick={props.onClick}
           >
-            {e["base-currency"].toLocaleUpperCase()}/
-            {e["quote-currency"].toLocaleUpperCase()}
-          </Button>
-        );
-      })}
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" color="inherit">
+            {props.title}
+          </Typography>
+        </Toolbar>
+      </AppBar>
     </div>
   );
-};
+}
