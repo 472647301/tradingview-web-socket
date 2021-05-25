@@ -28,10 +28,15 @@ _接口数据来自[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)需�
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
+
 cd tradingview-web-socket
-// 复制tradingview-web-socket目录下charting_library文件到tradingview-web-socket/react-typescript-demo/public目录下
+
 cd react-typescript-demo
+
+cp -R ../charting_library ./public
+
 yarn install
+
 yarn start
 ```
 
@@ -41,9 +46,32 @@ _接口数据来自[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)需�
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
+
 cd tradingview-web-socket
-// 复制tradingview-web-socket目录下charting_library文件到tradingview-web-socket/vue-javascript-demo/public目录下
+
 cd vue-javascript-demo
+
+cp -R ../charting_library ./public
+
 yarn install
+
+yarn serve
+```
+
+## 運行 Vue3 demo
+
+_接口數據來自[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)需要翻牆才能正常訪問_
+
+```shell
+git clone https://github.com/472647301/tradingview-web-socket
+
+cd tradingview-web-socket
+
+cd vue3-javascript-demo
+
+cp -R ../charting_library ./public
+
+yarn install
+
 yarn serve
 ```
