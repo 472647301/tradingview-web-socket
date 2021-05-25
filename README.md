@@ -30,10 +30,15 @@ _Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/c
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
+
 cd tradingview-web-socket
-// Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/react-typescript-demo/public directory
+
+cp -R ../charting_library ./public
+
 cd react-typescript-demo
+
 yarn install
+
 yarn start
 ```
 
@@ -43,10 +48,15 @@ _Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/c
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
+
 cd tradingview-web-socket
-// Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/vue-javascript-demo/public directory
+
+cp -R ../charting_library ./public
+
 cd vue-javascript-demo
+
 yarn install
+
 yarn serve
 ```
 ## Run Vue3 demo
@@ -55,9 +65,14 @@ _Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/c
 
 ```shell
 git clone https://github.com/472647301/tradingview-web-socket
+
 cd tradingview-web-socket
-// Copy the charting_library file in the tradingview-web-socket directory to the tradingview-web-socket/vue-javascript-demo/public directory
+
+cp -R ../charting_library ./public
+
 cd vue3-javascript-demo
+
 yarn install
+
 yarn serve
 ```
