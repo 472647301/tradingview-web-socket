@@ -33,9 +33,9 @@ git clone https://github.com/472647301/tradingview-web-socket
 
 cd tradingview-web-socket
 
-cp -R ../charting_library ./public
-
 cd react-typescript-demo
+
+cp -R ../charting_library ./public
 
 yarn install
 
@@ -51,9 +51,9 @@ git clone https://github.com/472647301/tradingview-web-socket
 
 cd tradingview-web-socket
 
-cp -R ../charting_library ./public
-
 cd vue-javascript-demo
+
+cp -R ../charting_library ./public
 
 yarn install
 
@@ -68,9 +68,9 @@ git clone https://github.com/472647301/tradingview-web-socket
 
 cd tradingview-web-socket
 
-cp -R ../charting_library ./public
-
 cd vue3-javascript-demo
+
+cp -R ../charting_library ./public
 
 yarn install
 
