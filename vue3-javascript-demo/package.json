@@ -39,7 +39,7 @@
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^7.6.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^7.0.0",
     "prettier": "^2.2.1",
     "prettier-eslint": "^12.0.0",
     "sass-loader": "^8.0.2",
