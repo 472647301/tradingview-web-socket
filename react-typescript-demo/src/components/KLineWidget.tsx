@@ -214,13 +214,14 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
   public createStudys = async () => {
     const chart = this.widget?.chart();
     // 先清除已创建指标
-    this.ids.forEach((id) => {
-      chart?.removeEntity(id);
-    });
-    this.ids = [];
+    chart?.removeAllStudies() // 包含成交量
+    // this.ids.forEach((id) => {
+    //   chart?.removeEntity(id);
+    // });
+    // this.ids = [];
     for (let item of defaultStudy) {
       const id = await chart?.createStudy(item[0], false, true, item[1]);
-      if (id) this.ids.push(id);
+      // if (id) this.ids.push(id);
     }
   };
 
