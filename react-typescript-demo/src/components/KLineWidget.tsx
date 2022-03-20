@@ -185,7 +185,7 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
         "header_compare",
         "header_undo_redo",
       ],
-      preset: this.isMobile() ? "mobile" : void 0,
+      // preset: this.isMobile() ? "mobile" : void 0,
     });
     this.widget
       .headerReady()
@@ -221,6 +221,8 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
     // this.ids = [];
     for (let item of defaultStudy) {
       const id = await chart?.createStudy(item[0], false, true, item[1]);
+      const study = chart?.getStudyById(id!)
+      study?.setUserEditEnabled(true)
       // if (id) this.ids.push(id);
     }
   };
