@@ -9,7 +9,11 @@ import {
   EntityId,
 } from "tradingview-api/lib/library.min";
 import { DataFeed, GetBarsParams, widget } from "tradingview-api";
-import { threadId } from "worker_threads";
+
+import BB from "../studys/BB";
+import EMA from "../studys/EMA";
+import MACD from "../studys/MACD";
+import SuperTrend from "../studys/SuperTrend";
 
 const INTERVAL = {
   "1": { server: "1min", name: "1m" },
@@ -33,6 +37,7 @@ const defaultStudy: Array<[string, Array<number | string>]> = [
   ["Bollinger Bands", [20, 2]],
   ["SuperTrend", [10, 1]],
   ["MACD", [12, 26, "close", 9]],
+  ["EMA Cross", [9, 26]],
 ];
 
 type KeyT = keyof typeof INTERVAL;
@@ -186,6 +191,11 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
         "header_undo_redo",
       ],
       // preset: this.isMobile() ? "mobile" : void 0,
+      custom_indicators_getter: function (PineJS) {
+        return new Promise((resolve) => {
+          resolve([BB(PineJS), EMA(PineJS), MACD(PineJS), SuperTrend(PineJS)]);
+        });
+      },
     });
     this.widget
       .headerReady()
@@ -214,15 +224,15 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
   public createStudys = async () => {
     const chart = this.widget?.chart();
     // 先清除已创建指标
-    chart?.removeAllStudies() // 包含成交量
+    chart?.removeAllStudies(); // 包含成交量
     // this.ids.forEach((id) => {
     //   chart?.removeEntity(id);
     // });
     // this.ids = [];
     for (let item of defaultStudy) {
       const id = await chart?.createStudy(item[0], false, true, item[1]);
-      const study = chart?.getStudyById(id!)
-      study?.setUserEditEnabled(true)
+      const study = chart?.getStudyById(id!);
+      study?.setUserEditEnabled(true);
       // if (id) this.ids.push(id);
     }
   };
