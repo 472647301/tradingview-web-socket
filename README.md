@@ -22,6 +22,7 @@ yarn add tradingview-api
 
 ## Screenshot
 
+<img src="https://github.com/472647301/tradingview-web-socket/blob/master/screenshot/20220401223421.png?raw=true" width="1038">
 <img src="https://github.com/472647301/tradingview-web-socket/blob/master/screenshot/screenshot.png?raw=true" width="1038">
 
 ## Run React demo
