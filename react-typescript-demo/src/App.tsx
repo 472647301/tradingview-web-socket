@@ -50,6 +50,7 @@ class App extends React.Component<Props, State> {
   }
 
   public componentDidMount() {
+    localStorage.clear();
     ws.initWebSocket();
     this.fetchSymbolList().then(() => {
       this.klineRef && this.klineRef.initTradingView();
