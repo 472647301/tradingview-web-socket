@@ -3,48 +3,46 @@
 /**
  * 详情：https://zlq4863947.gitbook.io/tradingview/creating-custom-studies
  */
-export default function BB(n) {
+export default function BB(s) {
   return {
-    name: "Bollinger Bands",
+    name: "myBB",
     metainfo: {
-      _metainfoVersion: 27,
+      _metainfoVersion: 52,
       isTVScript: false,
       isTVScriptStub: false,
       is_hidden_study: false,
       defaults: {
-        // 自定义样式
         styles: {
           plot_0: {
             linestyle: 0,
-            linewidth: 5,
+            linewidth: 1,
             plottype: 0,
             trackPrice: false,
-            transparency: 70,
+            transparency: 0,
             visible: true,
-            color: "#FF0000",
+            color: "#FF6D00",
           },
           plot_1: {
             linestyle: 0,
-            linewidth: 5,
+            linewidth: 1,
             plottype: 0,
             trackPrice: false,
-            transparency: 70,
+            transparency: 0,
             visible: true,
-            color: "#0000FF",
+            color: "#2196F3",
           },
           plot_2: {
             linestyle: 0,
             linewidth: 1,
             plottype: 0,
             trackPrice: false,
-            transparency: 35,
+            transparency: 0,
             visible: true,
-            color: "#0000FF",
+            color: "#2196F3",
           },
         },
-        precision: 4,
         filledAreasStyle: {
-          fill_0: { color: "#000080", transparency: 90, visible: true },
+          fill_0: { color: "#2196F3", transparency: 95, visible: true },
         },
         inputs: { in_0: 20, in_1: 2 },
       },
@@ -58,7 +56,7 @@ export default function BB(n) {
         plot_1: { title: "Upper", histogramBase: 0, joinPoints: false },
         plot_2: { title: "Lower", histogramBase: 0, joinPoints: false },
       },
-      description: "Bollinger Bands",
+      description: "myBB",
       shortDescription: "BB",
       is_price_study: true,
       filledAreas: [
@@ -88,40 +86,34 @@ export default function BB(n) {
           max: 50,
         },
       ],
-      id: "Bollinger Bands@tv-basicstudies-2",
+      id: "myBB@tv-basicstudies-1",
       scriptIdPart: "",
-      name: "Bollinger Bands",
+      name: "myBB",
+      format: { type: "inherit" },
       description_localized: "布林带(Bollinger Bands)",
     },
     constructor: function () {
-      this.f_0 = function (e, t) {
+      (this.f_0 = function (e, t) {
         return e * t;
-      };
-
-      this.f_1 = function (e, t) {
-        return e + t;
-      };
-
-      this.f_2 = function (e, t) {
-        return e - t;
-      };
-
-      this.main = function (e, t) {
-        var i, o, r, s, a, l, c, u;
-        return (
-          (this._context = e),
-          (this._input = t),
-          (i = n.Std.close(this._context)),
-          (o = this._input(0)),
-          (r = this._input(1)),
-          (s = this._context.new_var(i)),
-          (a = n.Std.sma(s, o, this._context)),
-          (l = this._context.new_var(i)),
-          (c = n.Std.stdev(l, o, this._context)),
-          (u = this.f_0(r, c)),
-          [a, this.f_1(a, u), this.f_2(a, u)]
-        );
-      };
+      }),
+        (this.f_1 = function (e, t) {
+          return e + t;
+        }),
+        (this.f_2 = function (e, t) {
+          return e - t;
+        }),
+        (this.main = function (e, t) {
+          (this._context = e), (this._input = t);
+          var i = s.Std.close(this._context),
+            r = this._input(0),
+            n = this._input(1),
+            o = this._context.new_var(i),
+            a = s.Std.sma(o, r, this._context),
+            l = this._context.new_var(i),
+            c = s.Std.stdev(l, r, this._context),
+            h = this.f_0(n, c);
+          return [a, this.f_1(a, h), this.f_2(a, h)];
+        });
     },
   };
 }

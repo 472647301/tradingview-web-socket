@@ -5,14 +5,13 @@
  */
 export default function SuperTrend(s) {
   return {
-    name: "SuperTrend",
+    name: "myST",
     metainfo: {
-      _metainfoVersion: 39,
+      _metainfoVersion: 52,
       isTVScript: false,
       isTVScriptStub: false,
       is_hidden_study: false,
       defaults: {
-        // 自定义样式
         styles: {
           plot_0: {
             linestyle: 0,
@@ -44,7 +43,6 @@ export default function SuperTrend(s) {
             color: "#FF0000",
           },
         },
-        precision: 4,
         palettes: {
           palette_0: {
             colors: {
@@ -86,7 +84,7 @@ export default function SuperTrend(s) {
           isHidden: false,
         },
       },
-      description: "SuperTrend",
+      description: "myST",
       shortDescription: "SuperTrend",
       is_price_study: true,
       palettes: {
@@ -113,46 +111,45 @@ export default function SuperTrend(s) {
           max: 100,
         },
       ],
-      id: "SuperTrend@tv-basicstudies-2",
+      id: "myST@tv-basicstudies-1",
       scriptIdPart: "",
-      name: "SuperTrend",
+      name: "myST",
       isCustomIndicator: true,
+      format: { type: "inherit" },
       description_localized: "超级趋势",
     },
     constructor: function () {
-      this.f_0 = function () {
-        var e,
-          t,
-          i = this._input(0),
-          n = this._input(1),
-          o = s.Std.atr(i, this._context);
+      (this.f_0 = function () {
+        var e = this._input(0),
+          t = this._input(1),
+          i = s.Std.atr(e, this._context),
+          r =
+            ((e = s.Std.hl2(this._context) + i * t),
+            (i = s.Std.hl2(this._context) - i * t),
+            this._context.new_var(s.Std.close(this._context))),
+          n = ((t = this._context.new_var()), s.Std.max(i, t.get(1)));
         return (
-          (i = s.Std.hl2(this._context) + o * n),
-          (o = s.Std.hl2(this._context) - o * n),
-          (e = this._context.new_var(s.Std.close(this._context))),
-          (n = this._context.new_var()),
-          (t = s.Std.max(o, n.get(1))),
-          n.set(s.Std.gt(e.get(1), n.get(1)) ? t : o),
-          (o = this._context.new_var()),
-          (t = s.Std.min(i, o.get(1))),
-          o.set(s.Std.lt(e.get(1), o.get(1)) ? t : i),
+          t.set(s.Std.gt(r.get(1), t.get(1)) ? n : i),
           (i = this._context.new_var()),
-          (e = s.Std.nz(i.get(1), 1)),
-          (e = s.Std.lt(s.Std.close(this._context), n.get(1)) ? -1 : e),
-          i.set(s.Std.gt(s.Std.close(this._context), o.get(1)) ? 1 : e),
+          (n = s.Std.min(e, i.get(1))),
+          i.set(s.Std.lt(r.get(1), i.get(1)) ? n : e),
+          (e = this._context.new_var()),
+          (r = s.Std.nz(e.get(1), 1)),
+          (r = s.Std.lt(s.Std.close(this._context), t.get(1)) ? -1 : r),
+          e.set(s.Std.gt(s.Std.close(this._context), i.get(1)) ? 1 : r),
           [
-            (n = s.Std.eq(i.get(0), 1) ? n.get(0) : o.get(0)),
-            s.Std.eq(i.get(0), 1) ? 0 : 1,
-            1 === i.get(0) && -1 === i.get(1),
-            -1 === i.get(0) && 1 === i.get(1),
+            (t = s.Std.eq(e.get(0), 1) ? t.get(0) : i.get(0)),
+            s.Std.eq(e.get(0), 1) ? 0 : 1,
+            1 === e.get(0) && -1 === e.get(1) ? 1 : NaN,
+            -1 === e.get(0) && 1 === e.get(1) ? 1 : NaN,
           ]
         );
-      };
-      this.main = function (e, t) {
-        (this._context = e), (this._input = t);
-        var i = this.f_0();
-        return [i[0], i[1], i[2], i[3]];
-      };
+      }),
+        (this.main = function (e, t) {
+          (this._context = e), (this._input = t);
+          var i = this.f_0();
+          return [i[0], i[1], i[2], i[3]];
+        });
     },
   };
 }

@@ -5,7 +5,7 @@
  */
 export default function MACD(s) {
   return {
-    name: "Moving Average Convergence/Divergence",
+    name: "myMACD",
     metainfo: {
       _metainfoVersion: 52,
       isTVScript: false,
@@ -81,7 +81,7 @@ export default function MACD(s) {
           },
         },
       },
-      description: "MACD",
+      description: "myMACD",
       shortDescription: "MACD",
       is_price_study: false,
       inputs: [
@@ -117,9 +117,9 @@ export default function MACD(s) {
           max: 50,
         },
       ],
-      id: "Moving Average Convergence/Divergence@tv-basicstudies-2",
+      id: "myMACD@tv-basicstudies-1",
       scriptIdPart: "",
-      name: "MACD",
+      name: "myMACD",
       description_localized: "MACD",
       format: { type: "inherit" },
     },

@@ -33,11 +33,11 @@ const INTERVAL = {
  * 默认展示指标 Array<[指标名称, [指标入参]]>
  */
 const defaultStudy: Array<[string, Array<number | string>]> = [
-  ["SuperTrend", [10, 3]],
-  ["Bollinger Bands", [20, 2]],
-  ["SuperTrend", [10, 1]],
-  ["MACD", [12, 26, "close", 9]],
-  ["EMA Cross", [9, 26]],
+  ["myST", [10, 3]],
+  ["myBB", [20, 2]],
+  ["myST", [10, 1]],
+  ["myMACD", [12, 26, "close", 9]],
+  ["myEMA", [9, 26]],
 ];
 
 type KeyT = keyof typeof INTERVAL;
