@@ -175,7 +175,7 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
     ].toLocaleUpperCase()}/${symbol["quote-currency"].toLocaleUpperCase()}`;
     this.widget = new (window as unknown as any).TradingView.widget({
       locale: "zh",
-      theme: "Light",
+      theme: "Dark",
       fullscreen: false,
       symbol: display_name,
       interval: this.interval,
