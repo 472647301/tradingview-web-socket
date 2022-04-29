@@ -5,13 +5,14 @@
  */
 export default function EMA(n) {
   return {
-    name: "myEMA",
+    name: "EMA Cross",
     metainfo: {
       _metainfoVersion: 27,
       isTVScript: false,
       isTVScriptStub: false,
       is_hidden_study: false,
       defaults: {
+        // 自定义样式
         styles: {
           plot_0: {
             linestyle: 0,
@@ -54,7 +55,7 @@ export default function EMA(n) {
         plot_1: { title: "Long", histogramBase: 0, joinPoints: false },
         plot_2: { title: "Crosses", histogramBase: 0, joinPoints: false },
       },
-      description: "myEMA",
+      description: "EMA Cross",
       shortDescription: "EMA Cross",
       is_price_study: true,
       inputs: [
@@ -75,9 +76,9 @@ export default function EMA(n) {
           max: 2000,
         },
       ],
-      id: "myEMA@tv-basicstudies-1",
+      id: "EMA Cross@tv-basicstudies-2",
       scriptIdPart: "",
-      name: "myEMA",
+      name: "EMA Cross",
       description_localized: "EMA交叉",
     },
     constructor: function () {
