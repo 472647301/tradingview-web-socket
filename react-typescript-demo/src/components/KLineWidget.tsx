@@ -1,14 +1,14 @@
 import * as React from "react";
 import { apiGet } from "../api";
 import { ws } from "../utils/socket";
-import { LibrarySymbolInfo } from "../datafeed/charting_library";
-import { DatafeedConfiguration } from "../datafeed/charting_library";
+import { LibrarySymbolInfo } from "tradingview-api/lib/library.min";
+import { DatafeedConfiguration } from "tradingview-api/lib/library.min";
 import {
   IChartingLibraryWidget,
   Bar,
   EntityId,
-} from "../datafeed/charting_library";
-import { DataFeed, GetBarsParams } from "../datafeed";
+} from "tradingview-api/lib/library.min";
+import { DataFeed, GetBarsParams, widget } from "tradingview-api";
 
 import BB from "../studys/BB";
 import EMA from "../studys/EMA";
@@ -91,7 +91,7 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
         minmov: 1,
         volume_precision: symbol["value-precision"],
         has_intraday: true,
-        supported_resolutions: Object.keys(INTERVAL) as any,
+        supported_resolutions: Object.keys(INTERVAL),
         has_weekly_and_monthly: true,
         has_daily: true,
       });
@@ -101,7 +101,7 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
   public fetchConfiguration = () => {
     return new Promise<DatafeedConfiguration>((resolve) => {
       resolve({
-        supported_resolutions: Object.keys(INTERVAL) as any,
+        supported_resolutions: Object.keys(INTERVAL),
       });
     });
   };
@@ -173,9 +173,9 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
     const display_name = `${symbol[
       "base-currency"
     ].toLocaleUpperCase()}/${symbol["quote-currency"].toLocaleUpperCase()}`;
-    this.widget = new (window as unknown as any).TradingView.widget({
+    this.widget = new widget({
       locale: "zh",
-      theme: "Dark",
+      theme: "Light",
       fullscreen: false,
       symbol: display_name,
       interval: this.interval,
@@ -191,13 +191,12 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
         "header_undo_redo",
       ],
       // preset: this.isMobile() ? "mobile" : void 0,
-      custom_indicators_getter: function (PineJS: any) {
+      custom_indicators_getter: function (PineJS) {
         return new Promise((resolve) => {
           resolve([BB(PineJS), EMA(PineJS), MACD(PineJS), SuperTrend(PineJS)]);
         });
       },
     });
-    if (!this.widget) return;
     this.widget
       .headerReady()
       .then(() => {
@@ -242,7 +241,7 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
     if (resolution === this.interval) {
       return;
     }
-    this.widget!.chart().setResolution(resolution as any, () => {
+    this.widget!.chart().setResolution(resolution, () => {
       if (this.isMobile()) {
         this.forceUpdate();
       } else {
@@ -268,7 +267,7 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
       `${symbol["base-currency"].toLocaleUpperCase()}/${symbol[
         "quote-currency"
       ].toLocaleUpperCase()}`,
-      this.interval as any,
+      this.interval,
       () => {}
     );
   };
