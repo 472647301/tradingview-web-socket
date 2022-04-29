@@ -3,13 +3,8 @@ import { apiGet } from "../api";
 import { ws } from "../utils/socket";
 import { LibrarySymbolInfo } from "tradingview-api/lib/library.min";
 import { DatafeedConfiguration } from "tradingview-api/lib/library.min";
-import {
-  IChartingLibraryWidget,
-  Bar,
-  EntityId,
-} from "tradingview-api/lib/library.min";
+import { IChartingLibraryWidget, Bar } from "tradingview-api/lib/library.min";
 import { DataFeed, GetBarsParams, widget } from "tradingview-api";
-import { threadId } from "worker_threads";
 
 const INTERVAL = {
   "1": { server: "1min", name: "1m" },
@@ -23,18 +18,6 @@ const INTERVAL = {
   "302400": { server: "1mon", name: "1M" },
 };
 
-// 切换到tv的iframe可通过 window.JSServer.studyLibrary 查看tv所有内置指标详情
-
-/**
- * 默认展示指标 Array<[指标名称, [指标入参]]>
- */
-const defaultStudy: Array<[string, Array<number | string>]> = [
-  ["SuperTrend", [10, 3]],
-  ["Bollinger Bands", [20, 2]],
-  ["SuperTrend", [10, 1]],
-  ["MACD", [12, 26, "close", 9]],
-];
-
 type KeyT = keyof typeof INTERVAL;
 type Props = {
   symbol: IApiSymbols;
@@ -46,7 +29,6 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
   private datafeed: DataFeed;
   private buttons: Array<HTMLElement> = [];
   private height: number;
-  private ids: EntityId[] = [];
 
   constructor(props: Partial<Props>) {
     super(props);
@@ -190,7 +172,6 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
     this.widget
       .headerReady()
       .then(() => {
-        this.createStudys();
         this.buttons = [];
         if (this.isMobile()) {
           return;
@@ -206,22 +187,6 @@ export class KLineWidget extends React.Component<Partial<Props>, State> {
         this.addButtonColor();
       })
       .catch(() => {});
-  };
-
-  /**
-   * 创建指标
-   */
-  public createStudys = async () => {
-    const chart = this.widget?.chart();
-    // 先清除已创建指标
-    this.ids.forEach((id) => {
-      chart?.removeEntity(id);
-    });
-    this.ids = [];
-    for (let item of defaultStudy) {
-      const id = await chart?.createStudy(item[0], false, true, item[1]);
-      if (id) this.ids.push(id);
-    }
   };
 
   public onButtonClick = (resolution: string) => {
