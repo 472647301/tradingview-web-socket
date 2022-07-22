@@ -95,5 +95,5 @@ cp -R ../charting_library ./public
 
 yarn install
 
-yarn serve
+yarn dev
 ```
