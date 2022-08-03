@@ -1,0 +1,21 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+#tv_chart_container iframe {
+  width: 100%;
+  height: 100%;
+}
+.kline-list {
+  height: 40px;
+  display: flex;
+}
+.kline-item {
+  flex: 1;
+  line-height: 40px;
+  text-align: center;
+}
