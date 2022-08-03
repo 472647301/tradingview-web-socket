@@ -23,8 +23,7 @@ The main branch demo uses the version of tvadingview v20.033 (internal id 9df149
 
 -## Example
 
-[react demo](http://test.byronzhu.com/tradingview/tv-react/build)
-[tradingview官方demo](http://test.byronzhu.com/tv/)
+[react demo](http://test.byronzhu.com/tv-react)
 
 ## Screenshot
 
