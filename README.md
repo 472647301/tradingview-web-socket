@@ -59,6 +59,7 @@ yarn install
 
 yarn serve
 ```
+
 ## Run Vue3 demo
 
 _Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
@@ -75,4 +76,24 @@ cp -R ../charting_library ./public
 yarn install
 
 yarn serve
+```
+
+## Run Vue3 Typescript demo
+
+Note: node JS version requires > 14.19.0
+
+_Interface data comes from [HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)_
+
+```shell
+git clone https://github.com/472647301/tradingview-web-socket
+
+cd tradingview-web-socket
+
+cd vue3-typescript-demo
+
+cp -R ../charting_library ./public
+
+yarn install
+
+yarn dev
 ```

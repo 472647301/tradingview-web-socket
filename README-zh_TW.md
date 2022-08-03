@@ -18,7 +18,6 @@ yarn add tradingview-api
 
 [React Example](https://github.com/472647301/tradingview-web-socket/tree/master/react-typescript-demo)
 
-
 [预览地址](http://demo.zhuwenbo.top/tradingview/react/)
 
 ## Screenshot
@@ -60,6 +59,7 @@ yarn install
 
 yarn serve
 ```
+
 ## 運行 Vue3 demo
 
 _接口數據來自[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)需要翻牆才能正常訪問_
@@ -76,4 +76,24 @@ cp -R ../charting_library ./public
 yarn install
 
 yarn serve
+```
+
+## 運行 Vue3 Typescript demo
+
+注意： Node.js 版本需要 > 14.19.0
+
+_接口數據來自[HuoBi API](https://huobiapi.github.io/docs/spot/v1/cn/)需要翻牆才能正常訪問_
+
+```shell
+git clone https://github.com/472647301/tradingview-web-socket
+
+cd tradingview-web-socket
+
+cd vue3-typescript-demo
+
+cp -R ../charting_library ./public
+
+yarn install
+
+yarn dev
 ```
