@@ -23,10 +23,6 @@ The main branch demo uses the version of tvadingview v20.033 (internal id 9df149
           printB --> stop
 ```
 
-## Example
-
-[react demo](http://test.byronzhu.com/tv-react)
-
 ## Task list
 - [x] add react demo
 - [ ] add vue demo:
